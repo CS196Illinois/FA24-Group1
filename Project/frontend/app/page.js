@@ -4,7 +4,7 @@ import Navbar from "./components/navbar.js";
 
 export default function Home() {
   return (
-    <><Navbar /><div className={styles.page}>
+    <div className={styles.page}>
       <main className={styles.main}>
         <Image
           className={styles.logo}
@@ -86,6 +86,6 @@ export default function Home() {
           Go to nextjs.org →
         </a>
       </footer>
-    </div></>
+    </div>
   );
 }

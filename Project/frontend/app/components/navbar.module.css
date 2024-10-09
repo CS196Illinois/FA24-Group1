@@ -1,0 +1,29 @@
+.navbar {
+    background-color: #f0f0f0;
+    color: black;
+    padding: 1rem;
+  }
+  
+  .navbar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: flex-end; 
+  }
+
+.logo {
+    display: left;
+    
+}
+.home {
+    margin-right: 50px;
+}
+.about {
+    margin-right: 50px;
+}
+.login {
+    margin-right: 50px;
+}
+
+  
