@@ -1,32 +1,44 @@
+/* makes navbar background*/
 .navbar {
     background-color: #f0f0f0;
     color: black;
-    padding: 1rem;
     display: flex;
   }
-  
-  .navbar ul {
-    list-style: none;
+ 
+/* get rid of bullet points and put list horizontal*/  
+.navbar ul {
+  list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
-    
+}
+
+/*styles website title*/
+.logo {
+    float: left;
+    display: block;
+    color: #000000;
+    text-align: center;
+    padding: 14px 20px;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+/* styles links */
+.navbar a {
+    float: right;
+    display: block;
+    color: #000000;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
   }
 
-.logo {
-    margin-right: 100px;
-    
-}
-.home {
-    margin-right: 25px;
-    margin-left: 25px;
-}
-.about {
-    margin-right: 25px;
-    margin-left: 25px;
-}
-.login {
-    margin-right: 25px;
-    margin-left: 25px;
-}
+
+/* highlight hover */
+.navbar a:hover {
+    background-color: #ddd;
+    color: black;
+  }
 
