@@ -44,5 +44,9 @@
 .navbar a:hover {
     background-color: #2f3652;
     color: rgb(255, 255, 255);
+    letter-spacing: 2px;
   }
 
+.activeLink {
+  background-color: yellow
+}
