@@ -7,7 +7,7 @@
     background-color: #39405B;
     color: #ffffff;
     display: flex;
-    box-shadow: 5px 5px 5px #888888;
+    box-shadow: 5px 5px 5px 5px #888888;
   }
  
 /* get rid of bullet points and put list horizontal*/  

@@ -40,3 +40,7 @@ a {
     color-scheme: dark;
   }
 }
+
+::selection {
+  background: #afb8db;
+}
