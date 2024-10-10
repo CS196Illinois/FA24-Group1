@@ -47,6 +47,7 @@
     letter-spacing: 2px;
   }
 
-.activeLink {
-  background-color: yellow
-}
+  .navbar a:active {
+    font-weight: bold;
+  }
+
