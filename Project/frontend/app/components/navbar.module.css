@@ -4,9 +4,10 @@
 /* makes navbar background*/
 .navbar {
   font-family: 'Ubuntu', sans-serif;
-    background-color: #ffffff;
-    color: #555555;
+    background-color: #39405B;
+    color: #ffffff;
     display: flex;
+    box-shadow: 5px 5px 5px #888888;
   }
  
 /* get rid of bullet points and put list horizontal*/  
@@ -15,6 +16,7 @@
     margin: 0;
     padding: 0;
     display: flex;
+    float: right;
 }
 
 /*styles website title*/
@@ -40,7 +42,7 @@
 
 /* highlight hover */
 .navbar a:hover {
-    background-color: #000c58;
+    background-color: #2f3652;
     color: rgb(255, 255, 255);
   }
 
