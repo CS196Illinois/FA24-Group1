@@ -22,6 +22,11 @@ const Navbar = () => {
       </Link>
     </li>
     <li>
+      <Link href="/createUser" className = {styles.item}>
+        create user
+      </Link>
+    </li>
+    <li>
       <Link href="/about" className= {styles.item}>
         about
       </Link>
