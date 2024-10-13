@@ -1,4 +1,4 @@
-export default function AboutPage() {
+export default function createUser() {
     return (
       <div>
         <h1>Create User</h1>
