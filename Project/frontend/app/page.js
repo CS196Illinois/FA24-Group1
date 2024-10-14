@@ -1,91 +1,64 @@
-import Image from "next/image";
-import styles from "./page.module.css";
-import Navbar from "./components/navbar.js";
+import React from 'react';
 
-export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority />
-        <ol>
-          <li>
-            Get started by editing <code>app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20} />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+const Quote = () => {
+    return (
+        <div style = {container}>
+            <img
+                src = "/Tree of Life.JPG"
+                alt = "Life of Tree"
+                style = {image}
+            />
+            <blockquote style = {quoteStyle}>
+                <h2 style = {quoteText}>
+                    Storing memories so that you don't have to 😎
+                </h2>
+                <h2 style = {extraStyle}>
+                    This is extra text if we wanted to add it
+                </h2>
+            </blockquote>
         </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16} />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16} />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16} />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+    );
 }
+
+const container = {
+    position: 'relative',
+    width: '100%',
+    maxWidth: '1280px',
+    margin: 'auto',
+    marginTop: '50px',
+    borderRadius: '8px',
+    textAlign: 'center',
+};
+
+const image = {
+    display: 'block',
+    margin: 'auto',
+    width: '1280px',
+    height: '428px',
+    borderRadius: '10px',
+};
+
+const quoteStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    color: 'white',
+    margin: 'auto',
+    padding: '5px',
+    backgroundColor: 'clear',
+};
+
+const quoteText = {
+    fontSize: '50px',
+    fontStyle: 'Arial',
+    color: 'white',
+};
+
+const extraStyle = {
+    margin: 'auto',
+    fontSize: '10px',
+    color: 'white',
+};
+
+export default Quote;
