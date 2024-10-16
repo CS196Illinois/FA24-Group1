@@ -17,22 +17,22 @@ export default function Home() {
         </h2>
       </div>
       <div className={styles.row}>
-      <div class={styles.column}>
+      <div className={styles.column}>
       <h2>Step 1</h2>
       <p>Create <br></br> Person</p>
       <Image alt="document" src={userImg} className={styles.center}/>
       </div>
-      <div class={styles.column}>
+      <div className={styles.column}>
       <h2>Step 2</h2>
       <p>Upload <br></br> File</p>
       <Image alt="document" src={documentImg} className={styles.center}/>
       </div>
-      <div class={styles.column}>
+      <div className={styles.column}>
       <h2>Step 3</h2>
       <p>Add <br></br> Description</p>
       <Image alt="document" src={writingImg} className={styles.center}/>
       </div>
-      <div class={styles.column}>
+      <div className={styles.column}>
       <h2>Step 4</h2>
       <p>Share <br></br> Memories</p>
       <Image alt="document" src={sendImg} className={styles.center}/>
