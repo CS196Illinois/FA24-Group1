@@ -19,12 +19,19 @@
     float: right;
 }
 
+.logoPic {
+  width: 30px;
+  height: 30px;
+  margin:10px 0px 10px 10px;
+}
+
 /*styles website title*/
 .logo {
+  font-weight: bold;
     float: left;
     display: block;
     text-align: center;
-    padding: 14px 20px;
+    padding: 14px 10px;
     text-decoration: none;
     font-size: 17px;
 }
