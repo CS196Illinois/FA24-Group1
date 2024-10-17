@@ -1,14 +1,13 @@
 .page {
-  background-color: #edd1a9;
+  background-color: #ffffff;
 }
 
 .part1 {
-  margin-top: 48px;
   color: #ffffff;
   font-family: 'Courier New', Courier, monospace;
   text-align: center;
   padding: 325px 0px 325px 0px;
-  background-image: url(./public/pg.jpg);
+  background-image: url(./public/children.jpg);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: top-center;
@@ -31,8 +30,8 @@
   float: right;
   width: 20%;
   text-align: center;
-  background-color: #dca455;
-  border-radius: 50px;
+  background-color: #edd1a93d;
+  border-radius: 10px;
   margin-top: 20px;
   margin-bottom: 20px;
   margin-right: 2%;
@@ -45,7 +44,6 @@
   font-size: 50px;
   padding-top: 20px;
   padding-bottom: 20px;
-  background-color: #e0af6a;
   margin:10px 10px 10px 10px;
   border-radius: 100px;
 }
@@ -54,11 +52,11 @@
   color: #f7f3ef;
   font-size: 50px;
   margin:10px 10px 10px 10px;
-  background-color: #e5bb7f;
   border-radius: 60px;
 }
 
 .row{
+  margin-top: 100px;
   display:flex;
 }
 .row:after {
@@ -73,5 +71,5 @@
   margin-right: auto;
   padding: 20px;
   filter: brightness(0) invert(1);
-  opacity: 0.75;
+  opacity: 0.85;
 }

@@ -4,10 +4,9 @@
   top: 0; 
   width: 100%;
   font-family: 'Times New Roman';
-    background-color: #e0af6a;
+    background-color: #e0af6ad7;
     color: #ffffff;
     display: flex;
-    box-shadow: 1px 1px 1px 2px #8888883a;
   }
  
 /* get rid of bullet points and put list horizontal*/  
