@@ -3,6 +3,9 @@ const express = require('express')
 const { MongoClient } = require("mongodb");
 const app = express()
 
+// Added this line to parse JSON bodies
+app.use(express.json());
+
 // Define the MongoDB URI
 const uri = "mongodb://localhost:27017/local";
 const client = new MongoClient(uri);
@@ -193,6 +196,93 @@ app.get('/addComment', async (req, res) => {
 });
 */
 
+// New User Endpoints
+// Creating a new user
+app.post('/users', async (req, res) => {
+    try {
+        const { username } = req.body;
+        // this classes the addUser function with the provided username
+        await addUser(username);
+        // Send a success response
+        res.status(201).send('User created successfully');
+    } catch (error) {
+        // If an error occurs, send an error response
+        res.status(500).send('Error creating user');
+    }
+});
+
+// Get all users
+app.get('/users', async (req, res) => {
+    try {
+        // this retrieves all users using the retrieveUser function
+        const users = await retrieveUser();
+        // this sends the users as a JSON response
+        res.json(users);
+    } catch (error) {
+        // If an error occurs, send an error response
+        res.status(500).send('Error retrieving users');
+    }
+});
+
+// New Memory Endpoints
+
+// Create a new memory
+app.post('/memories', async (req, res) => {
+    try {
+        // This extracts memory details from the request body
+        const { userID, description, title, isPhoto, tags, accessLevel } = req.body;
+        // this calls the addMemory function with the provided details
+        await addMemory(userID, description, title, isPhoto, tags, accessLevel);
+        // This sends a success response
+        res.status(201).send('Memory created successfully');
+    } catch (error) {
+        // If an error occurs, send an error response
+        res.status(500).send('Error creating memory');
+    }
+});
+
+// Get all memories
+app.get('/memories', async (req, res) => {
+    try {
+        // This retrieves all memories using the retrieveMemory function
+        const memories = await retrieveMemory();
+        // This sends the memories as a JSON response
+        res.json(memories);
+    } catch (error) {
+        // If an error occurs, send an error response
+        res.status(500).send('Error retrieving memories');
+    }
+});
+
+// New Comment Endpoints
+
+// Create a new comment
+app.post('/comments', async (req, res) => {
+    try {
+        // This extracts comment details from the request body
+        const { memoryID, userID, text } = req.body;
+        // this calls the addComment function with the provided details
+        await addComment(memoryID, userID, text);
+        // this sends a success response
+        res.status(201).send('Comment added successfully');
+    } catch (error) {
+        // If an error occurs, send an error response
+        res.status(500).send('Error adding comment');
+    }
+});
+
+// Get all comments
+app.get('/comments', async (req, res) => {
+    try {
+        // This retrieves all comments using the retrieveComment function
+        const comments = await retrieveComment();
+        // this sends the comments as a JSON response
+        res.json(comments);
+    } catch (error) {
+        // If an error occurs, send an error response
+        res.status(500).send('Error retrieving comments');
+    }
+});
 // Start the server
 const port = 3000
 app.listen(port, () => {

@@ -1,8 +1,56 @@
+import styles from "./about.module.css";
+import Image from "next/image";
+import dummyHeadshot from "../public/headshot-dummy.jpg";
+import graceHeadshot from "../public/graceHeadshot.jpg";
+import colinHeadshot from "../public/colinHeadshot.jpg";
+
+
 export default function AboutPage() {
     return (
-      <div>
-        <h1>About</h1>
-        <p>This is the about page.</p>
+      <div className = {styles.body}>
+        <div className= {styles.photo}>
+          <div className= {styles.text}>
+            <h1 className = {styles.ourTeam}> Meet the Team</h1>
+            <div className = {styles.table}>
+              <div className = {`${styles.div1} ${styles.cells}`}>
+                <Image alt="headshot" src={dummyHeadshot} className = {styles.headshot}/>
+                <p className = {styles.name}>Arwen Louie </p>
+                <p className = {styles.position}>Frontend </p>
+              </div> 
+              <div className = {`${styles.div2} ${styles.cells}`}>
+                <Image alt="headshot" src={colinHeadshot} className = {styles.headshot}/>
+                <p className = {styles.name}>Colin Su </p>
+                <p className = {styles.position}>Frontend </p>
+              </div>
+              <div className = {`${styles.div3} ${styles.cells}`}>
+                <Image alt="headshot" src={graceHeadshot} className = {styles.headshot}/>
+                <p className = {styles.name}>Grace Sletten </p>
+                <p className = {styles.position}>Frontend </p>
+              </div>
+              <div className = {`${styles.div4} ${styles.cells}`}>
+                <Image alt="headshot" src={dummyHeadshot} className = {styles.headshot}/>
+                <p className = {styles.name}>Isabella Marquez </p>
+                <p className = {styles.position}>Frontend </p>
+              </div>
+              <div className = {`${styles.div5} ${styles.cells}`}>
+                <Image alt="headshot" src={dummyHeadshot} className = {styles.headshot}/>
+                <p className = {styles.name}>Kevin Hwang </p>
+                <p className = {styles.position}>Backend </p>
+              </div>
+              <div className = {`${styles.div6} ${styles.cells}`}>
+                <Image alt="headshot" src={dummyHeadshot} className = {styles.headshot}/>
+                <p className = {styles.name}>Muhais Olatundun </p>
+                <p className = {styles.position}>Backend </p>
+              </div>
+              <div className = {`${styles.div7} ${styles.cells}`}>
+                <Image alt="headshot" src={dummyHeadshot} className = {styles.headshot}/>
+                <p className = {styles.name}>Yutaka Gomi </p>
+                <p className = {styles.position}>Frontend </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
       </div>
     );
   }
