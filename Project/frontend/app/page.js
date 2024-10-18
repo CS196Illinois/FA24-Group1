@@ -1,9 +1,9 @@
 import Image from "next/image";
-import userImg from './public/user.png';
-import documentImg from './public/document.png';
-import writingImg from './public/writing.png';
-import sendImg from './public/send.png';
-import styles from "./page.module.css";
+import userImg from '/public/user.png';
+import documentImg from '/public/document.png';
+import writingImg from '/public/writing.png';
+import sendImg from '/public/send.png';
+import styles from './page.module.css';
 
 export default function Home() {
   return (

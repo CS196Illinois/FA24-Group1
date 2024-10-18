@@ -1,0 +1,115 @@
+/* ViewPerson.module.css */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 70px 20px 20px; /* Added top padding */
+  min-height: 100vh;
+  background-image: url('/memories2.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.profileName {
+  font-size: 24px;
+  margin-bottom: 10px;
+  background-color: rgba(204, 119, 28, 0.6); /* Semi-transparent black background */
+  color: #fff; /* White text for contrast */
+  padding: 10px; /* Padding inside the box */
+  border-radius: 8px; /* Rounded corners */
+  text-align: center; /* Center the text */
+}
+
+.profilePic {
+  border-radius: 50%;
+  margin-bottom: 10px;
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.profileInfo {
+  background-color: rgba(204, 119, 28, 0.6); /* Semi-transparent black background */
+  color: #fff; /* White text for contrast */
+  padding: 10px; /* Padding inside the box */
+  border-radius: 8px; /* Rounded corners */
+  margin: 5px 0; /* Space between profile info items */
+  text-align: center; /* Center the text */
+}
+
+.eventsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-content: flex-start;
+  flex-grow: 1;
+  width: 100%;
+}
+
+.eventItem {
+  display: flex;
+  flex-direction: column;
+  width: calc(50% - 10px);
+  margin-bottom: 20px;
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 66.67%; /* Aspect ratio */
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.eventImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.eventImage:hover {
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+ .eventItem {
+   width: 100%;
+ }
+}
+
+.button {
+ padding: 10px 20px;
+ background-color: #007BFF;
+ color: white;
+ border: none;
+ border-radius: 5px;
+ cursor: pointer;
+}
+
+.button:hover {
+ background-color: #0056b3;
+}
+
+.eventTitle {
+  text-align: center;
+  background-color: rgba(204, 119, 28, 0.6);/* Semi-transparent black background */
+  color: #fff; /* White text for contrast */
+  padding: 10px 15px; /* Padding inside the box */
+  border-radius: 8px; /* Rounded corners */
+  display: inline-block; /* Box fits content */
+  margin-top: 10px; /* Space above the title */
+}
