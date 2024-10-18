@@ -6,7 +6,6 @@ const app = express()
 // Added this line to parse JSON bodies
 app.use(express.json());
 
-
 // Define the MongoDB URI
 const uri = "mongodb://localhost:27017/local";
 const client = new MongoClient(uri);
@@ -197,7 +196,6 @@ app.get('/addComment', async (req, res) => {
 });
 */
 
-
 // New User Endpoints
 // Creating a new user
 app.post('/users', async (req, res) => {
@@ -285,7 +283,6 @@ app.get('/comments', async (req, res) => {
         res.status(500).send('Error retrieving comments');
     }
 });
-
 // Start the server
 const port = 3000
 app.listen(port, () => {
