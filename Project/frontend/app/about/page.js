@@ -2,6 +2,8 @@ import styles from "./about.module.css";
 import Image from "next/image";
 import dummyHeadshot from "../public/headshot-dummy.jpg";
 import graceHeadshot from "../public/graceHeadshot.jpg";
+import colinHeadshot from "../public/colinHeadshot.jpg";
+
 
 export default function AboutPage() {
     return (
@@ -16,7 +18,7 @@ export default function AboutPage() {
                 <p className = {styles.position}>Frontend </p>
               </div> 
               <div className = {`${styles.div2} ${styles.cells}`}>
-                <Image alt="headshot" src={dummyHeadshot} className = {styles.headshot}/>
+                <Image alt="headshot" src={colinHeadshot} className = {styles.headshot}/>
                 <p className = {styles.name}>Colin Su </p>
                 <p className = {styles.position}>Frontend </p>
               </div>
