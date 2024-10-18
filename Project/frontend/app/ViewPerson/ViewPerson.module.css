@@ -1,0 +1,99 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    min-height: 100vh;
+    background-image: url('../public/Memories.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+  
+
+
+  .profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+    color: dark
+  }
+
+  .profileTextBox {
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+  
+  .profileName, .profileInfo {
+    color: white;
+    margin: 0;
+  }
+  
+  .profilePic {
+    border-radius: 50%;
+    margin-bottom: 10px;
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+  }
+  
+  .profileInfo {
+    margin: 5px 0;
+  }
+  
+  .eventsGrid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-content: flex-start;
+    flex-grow: 1;
+    width: 100%;
+  }
+  
+  .eventItem {
+    display: flex;
+    flex-direction: column;
+    width: calc(50% - 10px);
+    margin-bottom: 20px;
+  }
+  
+  .imageWrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 66.67%;
+    overflow: hidden;
+  }
+  
+  .eventImage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .imageWrapper:hover .eventImage {
+    transform: scale(1.1);
+  }
+  
+  .eventTitle {
+    margin-top: 10px;
+    text-align: center;
+    background-color: rgba(120, 73, 12, 0.6);
+    padding: 5px;
+    border-radius: 5px;
+    color: whitesmoke
+  }
+  
+  @media (max-width: 768px) {
+    .eventItem {
+      width: 100%;
+    }
+  }
