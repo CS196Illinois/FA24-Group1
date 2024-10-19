@@ -4,9 +4,10 @@
   top: 0; 
   width: 100%;
   font-family: 'Times New Roman';
-    background-color: #e0af6ad7;
-    color: #ffffff;
-    display: flex;
+  background-color: #e0af6ad7;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
   }
  
 /* get rid of bullet points and put list horizontal*/  
@@ -16,6 +17,26 @@
     padding: 0;
     display: flex;
     float: right;
+}
+
+div.navbarLeft {
+  float: left;
+  position: relative;
+  display: flex;
+}
+
+div.navbarCenter {
+  margin-left: 450px;
+  position: relative;
+  display: flex;
+  float: center;
+}
+
+div.navbarRight {
+  margin-left: 450px;
+  position: relative;
+  display: flex;
+  float: right;
 }
 
 .logoPic {
