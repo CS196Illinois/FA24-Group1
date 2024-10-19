@@ -16,26 +16,26 @@ const Navbar = () => {
         </li>
         <li>
           <Link href="/" className={styles.item}>
-            home
+            Home
           </Link>
         </li>
         <li>
           <Link href="/login" className={styles.item}>
-            login
+            Login
           </Link>
         </li>
         <li>
           <Link href="/createUser" className={styles.item}>
-            create user
+            Create User
           </Link>
         </li>
         <li>
           <Link href="/about" className={styles.item}>
-            about
+            About
           </Link>
         </li>
         <li>
-          <Link href="/View-Person">view person</Link>
+          <Link href="/View-Person">View Person</Link>
         </li>
       </ul>
     </nav>
