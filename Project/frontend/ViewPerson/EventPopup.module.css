@@ -15,7 +15,8 @@
 }
 
 .popup {
-  background-color: rgb(179, 130, 25);
+  color: #170e00;
+  background-color: #e9c694;
   padding: 20px;
   border-radius: 5px;
   max-width: 80%;
