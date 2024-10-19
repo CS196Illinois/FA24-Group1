@@ -3,7 +3,7 @@ import Image from "next/image";
 import dummyHeadshot from "../public/headshot-dummy.jpg";
 import graceHeadshot from "../public/graceHeadshot.jpg";
 import colinHeadshot from "../public/colinHeadshot.jpg";
-
+import isabellaHeadshot from "../public/isabellaHeadshot.png"
 
 export default function AboutPage() {
     return (
@@ -28,7 +28,7 @@ export default function AboutPage() {
                 <p className = {styles.position}>Frontend </p>
               </div>
               <div className = {`${styles.div4} ${styles.cells}`}>
-                <Image alt="headshot" src={dummyHeadshot} className = {styles.headshot}/>
+                <Image alt="headshot" src={isabellaHeadshot} className = {styles.headshot}/>
                 <p className = {styles.name}>Isabella Marquez </p>
                 <p className = {styles.position}>Frontend </p>
               </div>
