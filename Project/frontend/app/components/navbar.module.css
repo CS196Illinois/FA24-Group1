@@ -48,12 +48,12 @@ div.navbarRight {
 /*styles website title*/
 .logo {
   font-weight: bold;
-    float: left;
-    display: block;
-    text-align: center;
-    padding: 14px 10px;
-    text-decoration: none;
-    font-size: 17px;
+  float: left;
+  display: block;
+  text-align: center;
+  padding: 5px 10px;
+  text-decoration: none;
+  font-size: 17px;
 }
 
 /* styles links */
@@ -67,25 +67,24 @@ div.navbarRight {
     font-size: 17px;
   }
 
+.navbar a {
+  color: #ffffff; /* White text */
+  float: right;
+  display: block;
+  text-align: center;
+  padding: 14px 16px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-size: 17px;
+}
 
 /* highlight hover */
 .navbar a:hover {
-    background-color: #dca455;
-    color: rgb(255, 255, 255);
-    letter-spacing: 2px;
-  }
+  background-color: #dca455;
+  color: rgb(255, 255, 255);
+  /* letter-spacing: 2px; */
+}
 
-  .navbar a:active {
-    font-weight: bold;
-  }
-
-  .navbar a {
-    color: #ffffff; /* White text */
-    float: right;
-    display: block;
-    text-align: center;
-    padding: 14px 16px;
-    border-radius: 25px;
-    text-decoration: none;
-    font-size: 17px;
-  }
+.navbar a:active {
+  /* font-weight: bold; */
+}
