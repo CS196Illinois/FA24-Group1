@@ -82,9 +82,9 @@ div.navbarRight {
 .navbar a:hover {
   background-color: #dca455;
   color: rgb(255, 255, 255);
-  /* letter-spacing: 2px; */
+  letter-spacing: 2px;
 }
 
 .navbar a:active {
-  /* font-weight: bold; */
+   font-weight: bold; 
 }
