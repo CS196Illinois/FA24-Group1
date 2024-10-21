@@ -6,8 +6,8 @@ import styles from './friends.module.css';
 
 const friends = [
   { name: 'Johnny Anderson', url: '/View-Person', picture: '/Johnny.jpeg' },
-  { name: 'Jane Anderson', url: '/login', picture: '/Johnny.jpeg'},
-  { name: 'Chris Anderson', url: '/chris', picture: '/Johnny.jpeg'}
+  { name: 'Jane Anderson', url: '/login', picture: '/headshot-dummy.jpg'},
+  { name: 'Chris Anderson', url: '/chris', picture: '/headshot-dummy.jpg'}
 ];
 
 const PersonIcon = ({ name, url, picture }) => {
