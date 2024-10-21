@@ -36,8 +36,8 @@ const Navbar = () => {
   <div className = {styles.navbarRight}>
     <ul>
       <li>
-        <Link href="/login" className = {styles.item}>
-          login
+        <Link href="/listOfPeople" className = {styles.item}>
+          people
         </Link>
       </li>
       <li>
