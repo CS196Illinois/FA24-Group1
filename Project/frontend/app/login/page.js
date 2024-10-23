@@ -5,7 +5,6 @@ import Link from 'next/link';
 
 export default function Login() {
     return (
-<<<<<<< HEAD
       <div className = {styles.photo}>
         <div className = {styles.pad}>
           <div className = {styles.box}>
@@ -22,13 +21,6 @@ export default function Login() {
               </Link>
           </div>
         </div>
-=======
-      <div>
-        <h1> . </h1>
-        <h1> . </h1>
-        <h1>Login</h1>
-        <p>This is the login page.</p>
->>>>>>> 60b48d0fe5de30e37b0d91b98f87a8e43ff255bd
       </div>
     );
 }
