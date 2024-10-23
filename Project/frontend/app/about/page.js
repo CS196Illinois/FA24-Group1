@@ -3,7 +3,7 @@ import Image from "next/image";
 import dummyHeadshot from "../public/headshot-dummy.jpg";
 import graceHeadshot from "../public/graceHeadshot.jpg";
 import colinHeadshot from "../public/colinHeadshot.jpg";
-
+import arwenHeadshot from "../public/arwenHeadshot.jpg";
 
 export default function AboutPage() {
     return (
@@ -13,7 +13,7 @@ export default function AboutPage() {
             <h1 className = {styles.ourTeam}> Meet the Team</h1>
             <div className = {styles.table}>
               <div className = {`${styles.div1} ${styles.cells}`}>
-                <Image alt="headshot" src={dummyHeadshot} className = {styles.headshot}/>
+                <Image alt="headshot" src={arwenHeadshot} className = {styles.headshot}/>
                 <p className = {styles.name}>Arwen Louie </p>
                 <p className = {styles.position}>Frontend </p>
               </div> 
