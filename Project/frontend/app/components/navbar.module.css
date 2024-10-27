@@ -4,9 +4,10 @@
   top: 0; 
   width: 100%;
   font-family: 'Times New Roman';
-    background-color: #e0af6ad7;
-    color: #ffffff;
-    display: flex;
+  background-color: #e0af6ad7;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
   }
  
 /* get rid of bullet points and put list horizontal*/  
@@ -18,21 +19,41 @@
     float: right;
 }
 
+div.navbarLeft {
+  float: left;
+  position: relative;
+  display: flex;
+}
+
+div.navbarCenter {
+  margin-left: 450px;
+  position: relative;
+  display: flex;
+  float: center;
+}
+
+div.navbarRight {
+  margin-left: 450px;
+  position: relative;
+  display: flex;
+  float: right;
+}
+
 .logoPic {
   width: 30px;
   height: 30px;
-  margin:10px 0px 10px 10px;
+  margin:8px 0px 0px 10px;
 }
 
 /*styles website title*/
 .logo {
   font-weight: bold;
-    float: left;
-    display: block;
-    text-align: center;
-    padding: 14px 10px;
-    text-decoration: none;
-    font-size: 17px;
+  float: left;
+  display: block;
+  text-align: center;
+  padding: 5px 10px;
+  text-decoration: none;
+  font-size: 17px;
 }
 
 /* styles links */
@@ -46,25 +67,24 @@
     font-size: 17px;
   }
 
+.navbar a {
+  color: #ffffff; /* White text */
+  float: right;
+  display: block;
+  text-align: center;
+  padding: 14px 16px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-size: 17px;
+}
 
 /* highlight hover */
 .navbar a:hover {
-    background-color: #dca455;
-    color: rgb(255, 255, 255);
-    letter-spacing: 2px;
-  }
+  background-color: #dca455;
+  color: rgb(255, 255, 255);
+  letter-spacing: 2px;
+}
 
-  .navbar a:active {
-    font-weight: bold;
-  }
-
-  .navbar a {
-    color: #ffffff; /* White text */
-    float: right;
-    display: block;
-    text-align: center;
-    padding: 14px 16px;
-    border-radius: 25px;
-    text-decoration: none;
-    font-size: 17px;
-  }
+.navbar a:active {
+   font-weight: bold; 
+}
