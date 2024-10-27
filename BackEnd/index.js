@@ -1,290 +1,224 @@
-// Description: Main entry point for the application.
-const express = require('express')
+// I'm importing the necessary modules
+const express = require('express');
 const { MongoClient } = require("mongodb");
-const app = express()
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const session = require('express-session');
+require('dotenv').config();
 
-// Added this line to parse JSON bodies
+const app = express();
+
+// I'm setting up middleware
 app.use(express.json());
+app.use(session({
+    secret: 'your_session_secret', // I need to replace this with a real secret in production
+    resave: false,
+    saveUninitialized: true
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
-// Define the MongoDB URI
+// I'm setting up my MongoDB connection
 const uri = "mongodb://localhost:27017/local";
 const client = new MongoClient(uri);
 
-// Retrieve the data from the collections(User, Memory, Comment)
-async function retrieveUser() {
-    try {
-        await client.connect(); // Ensure the client is connected
-
-        const database = client.db('local');
-
-        const users = database.collection('User');  // Find all of the users in the collection
-        const userList = await users.find().toArray();
-        console.log(userList);
-        return userList;
-    } finally {
-        await client.close(); // Ensures that the client will close when you finish/error
-    }
-}
-
-async function retrieveMemory() {
+// I'm configuring Passport to use Google Strategy
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "http://localhost:3000/auth/google/callback"
+}, async (accessToken, refreshToken, profile, done) => {
     try {
         await client.connect();
-
         const database = client.db('local');
+        const users = database.collection('User');
 
-        const memories = database.collection('Memory');
-        const memoryList = await memories.find().toArray();
-        console.log(memoryList);
-        return memoryList;
+        // I'm checking if the user exists, if not I'm creating a new user
+        let user = await users.findOne({ googleId: profile.id });
+        if (!user) {
+            user = {
+                googleId: profile.id,
+                email: profile.emails[0].value,
+                name: profile.displayName,
+                profilePicture: profile.photos[0].value,
+                friends: [],
+                dateCreated: new Date()
+            };
+            await users.insertOne(user);
+        }
+        done(null, user);
+    } catch (error) {
+        done(error, null);
     } finally {
         await client.close();
     }
-}
+}));
 
-async function retrieveComment() {
-    try {
-        await client.connect();
-
-        const database = client.db('local');
-
-        const comments = database.collection('Comment');
-        const commentList = await comments.find().toArray();
-        console.log(commentList);
-        return commentList;
-    } finally {
-        await client.close();
-    }
-}
-
-// Add a data for the collections
-async function addUser(username) {
-    try {
-        await client.connect();
-
-        const database = client.db('local');
-
-        const users = database.collection('User');  
-        
-        const doc = {
-            //_id(Object id) is going to be automatically created
-            Username: username, //string
-            Friends: [], //Array of object id
-            DateCreated: new Date(),
-        };
-
-        const result = await users.insertOne(doc);
-        console.log(`A document was inserted with the _id: ${result.insertedId}`);
-    } finally {
-        await client.close();
-    }
-}
-
-async function addMemory(userID, description, title, isPhoto, tags, accessLevel) {
-    try {
-        await client.connect();
-
-        const database = client.db('local');
-
-        const memories = database.collection('Memory');  
-        
-        const doc = {
-            //_id(Object id) is going to be automatically created
-            UserID: userID,
-            Comments: [], //Array of object id
-            DateCreated: new Date(),
-            Description: description,
-            Title: title,
-            Like: 0,
-            IsPhoto: isPhoto,
-            FilePath: "",
-            Tags: tags, //Array of string
-            AccessLevel: accessLevel
-        };
-
-        const result = await memories.insertOne(doc);
-        console.log(`A document was inserted with the _id: ${result.insertedId}`);
-    } finally {
-        await client.close();
-    }
-}
-
-async function addComment(memoryID, userID, text) {
-    try {
-        await client.connect();
-
-        const database = client.db('local');
-
-        const comments = database.collection('Comment');  
-        
-        const doc = {
-            //_id(Object id) is going to be automatically created
-            MemoryID: memoryID,
-            UserID: userID,
-            Text: text,
-            DateCreated: new Date(),
-        };
-
-        const result = await comments.insertOne(doc);
-        console.log(`A document was inserted with the _id: ${result.insertedId}`);
-    } finally {
-        await client.close();
-    }
-}
-
-// Root route
-app.get('/', (req, res) => {
-    res.send('Welcome to the API');
+// I'm telling Passport how to serialize the user
+passport.serializeUser((user, done) => {
+    done(null, user.googleId);
 });
 
-// Route of '/data' to retrieve all the data from the collections
-app.get('/data', async (req, res) => {
+// I'm telling Passport how to deserialize the user
+passport.deserializeUser(async (googleId, done) => {
     try {
-        await client.connect(); // Ensure the client is connected
+        await client.connect();
+        const database = client.db('local');
+        const users = database.collection('User');
+        const user = await users.findOne({ googleId: googleId });
+        done(null, user);
+    } catch (error) {
+        done(error, null);
+    } finally {
+        await client.close();
+    }
+});
 
-        // Retrieve all data from the collections
-        const userList = await retrieveUser();
-        const memoryList = await retrieveMemory();
-        const commentList = await retrieveComment();
+// I'm setting up Google Auth routes
+app.get('/auth/google',
+    passport.authenticate('google', { scope: ['profile', 'email'] })
+  ); //so when i viit http://localhost:3000/auth/google this route triggers in the server.js
 
-        // Combine all data into a single object
+app.get('/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  (req, res) => {
+    console.log("Authentication successful, user:", req.user);
+    res.redirect('/dashboard');
+  }
+);
+
+// Dashboard route
+app.get('/dashboard', (req, res) => {
+  if (req.isAuthenticated()) {
+    res.send(`Welcome to your dashboard, ${req.user.name}! <a href="/logout">Logout</a>`);
+  } else {
+    res.redirect('/auth/google');
+  }
+});
+
+// Logout route
+app.get('/logout', (req, res) => {
+  req.logout(function(err) {
+    if (err) { return next(err); }
+    res.redirect('/');
+  });
+});
+
+// Home route
+app.get('/', (req, res) => {
+  if (req.isAuthenticated()) {
+    res.send(`Hello, ${req.user.name}! <a href="/dashboard">Go to dashboard</a> | <a href="/logout">Logout</a>`);
+  } else {
+    res.send('Welcome! <a href="/auth/google">Login with Google</a>');
+  }
+});
+
+// I'm modifying the existing functions to work with Google login data
+
+// This function retrieves a user by their Google ID
+async function retrieveUser(googleId) {
+    try {
+        await client.connect();
+        const database = client.db('local');
+        const users = database.collection('User');
+        return await users.findOne({ googleId: googleId });
+    } finally {
+        await client.close();
+    }
+}
+
+// This function retrieves memories for a specific user
+async function retrieveMemory(userId) {
+    try {
+        await client.connect();
+        const database = client.db('local');
+        const memories = database.collection('Memory');
+        return await memories.find({ UserID: userId }).toArray();
+    } finally {
+        await client.close();
+    }
+}
+
+// This function retrieves comments for a specific memory
+async function retrieveComment(memoryId) {
+    try {
+        await client.connect();
+        const database = client.db('local');
+        const comments = database.collection('Comment');
+        return await comments.find({ MemoryID: memoryId }).toArray();
+    } finally {
+        await client.close();
+    }
+}
+
+// I'm modifying the routes to work with the new authentication system
+
+// This route retrieves all data for the authenticated user
+app.get('/data', async (req, res) => {
+    if (!req.user) {
+        return res.status(401).send('Unauthorized');
+    }
+    try {
+        const userList = await retrieveUser(req.user.googleId);
+        const memoryList = await retrieveMemory(req.user._id);
+        const commentList = await retrieveComment(memoryList.map(m => m._id));
         const data = {
             users: userList,
             memories: memoryList,
             comments: commentList
         };
-
-        // Send the combined data as a JSON response
         res.json(data);
-    } finally {
-        await client.close();
-    }
-}); 
-
-/*// Route to add a user and test the addUser function
-app.get('/addUser', async (req, res) => {
-    try {
-        await client.connect();
-        await addUser('testUser');
-        res.send('User added successfully');
-    } finally {
-        await client.close();
-    }
-});
-*/
-
-/*// Route to add a Memory and test the addMemory function
-app.get('/addMemory', async (req, res) => {
-    try {
-        await client.connect();
-        await addMemory('testUserID', 'testDescription', 'testTitle', true, ['testTag1', 'testTag2'], '0');
-        res.send('Memory added successfully');
-    } finally {
-        await client.close();
-    }
-});
-*/
-
-/*// Route to add a Memory and test the addMemory function
-app.get('/addComment', async (req, res) => {
-    try {
-        await client.connect();
-        await addComment('testMemoryID', 'testUserID', 'testText');
-        res.send('Comment added successfully');
-    } finally {
-        await client.close();
-    }
-});
-*/
-
-// New User Endpoints
-// Creating a new user
-app.post('/users', async (req, res) => {
-    try {
-        const { username } = req.body;
-        // this classes the addUser function with the provided username
-        await addUser(username);
-        // Send a success response
-        res.status(201).send('User created successfully');
     } catch (error) {
-        // If an error occurs, send an error response
-        res.status(500).send('Error creating user');
+        res.status(500).send('Error retrieving data');
     }
 });
 
-// Get all users
+// This route retrieves the authenticated user's information
 app.get('/users', async (req, res) => {
+    if (!req.user) {
+        return res.status(401).send('Unauthorized');
+    }
     try {
-        // this retrieves all users using the retrieveUser function
-        const users = await retrieveUser();
-        // this sends the users as a JSON response
-        res.json(users);
+        const user = await retrieveUser(req.user.googleId);
+        res.json(user);
     } catch (error) {
-        // If an error occurs, send an error response
-        res.status(500).send('Error retrieving users');
+        res.status(500).send('Error retrieving user');
     }
 });
 
-// New Memory Endpoints
-
-// Create a new memory
-app.post('/memories', async (req, res) => {
-    try {
-        // This extracts memory details from the request body
-        const { userID, description, title, isPhoto, tags, accessLevel } = req.body;
-        // this calls the addMemory function with the provided details
-        await addMemory(userID, description, title, isPhoto, tags, accessLevel);
-        // This sends a success response
-        res.status(201).send('Memory created successfully');
-    } catch (error) {
-        // If an error occurs, send an error response
-        res.status(500).send('Error creating memory');
-    }
-});
-
-// Get all memories
+// This route retrieves memories for the authenticated user
 app.get('/memories', async (req, res) => {
+    if (!req.user) {
+        return res.status(401).send('Unauthorized');
+    }
     try {
-        // This retrieves all memories using the retrieveMemory function
-        const memories = await retrieveMemory();
-        // This sends the memories as a JSON response
+        const memories = await retrieveMemory(req.user._id);
         res.json(memories);
     } catch (error) {
-        // If an error occurs, send an error response
         res.status(500).send('Error retrieving memories');
     }
 });
 
-// New Comment Endpoints
-
-// Create a new comment
-app.post('/comments', async (req, res) => {
-    try {
-        // This extracts comment details from the request body
-        const { memoryID, userID, text } = req.body;
-        // this calls the addComment function with the provided details
-        await addComment(memoryID, userID, text);
-        // this sends a success response
-        res.status(201).send('Comment added successfully');
-    } catch (error) {
-        // If an error occurs, send an error response
-        res.status(500).send('Error adding comment');
+// This route retrieves comments for a specific memory
+app.get('/comments/:memoryId', async (req, res) => {
+    if (!req.user) {
+        return res.status(401).send('Unauthorized');
     }
-});
-
-// Get all comments
-app.get('/comments', async (req, res) => {
     try {
-        // This retrieves all comments using the retrieveComment function
-        const comments = await retrieveComment();
-        // this sends the comments as a JSON response
+        const comments = await retrieveComment(req.params.memoryId);
         res.json(comments);
     } catch (error) {
-        // If an error occurs, send an error response
         res.status(500).send('Error retrieving comments');
     }
 });
-// Start the server
-const port = 3000
+
+// THis starts the server
+const port = 3000;
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
+    console.log(`I've started the server on port ${port}`);
+    console.log(`http://localhost:${port}/auth/google`);
+    console.log(`http://localhost:${port}/users`);
+    console.log(`http://localhost:${port}/memories`);
+    console.log(`http://localhost:${port}/comments`);
+    console.log(`http://localhost:${port}/comments/MEMORY_ID`); // To get comments for a specific memory (replace MEMORY_ID with an actual memory ID)
+});
