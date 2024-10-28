@@ -4,7 +4,7 @@ import dummyHeadshot from "../public/headshot-dummy.jpg";
 import graceHeadshot from "../public/graceHeadshot.jpg";
 import colinHeadshot from "../public/colinHeadshot.jpg";
 import kevinHeadshot from "../public/kevinHeadshot.png"
-import arwenHeadshot from "../public/arwenHeadshot.jpg"
+import arwenHeadshot from "../public/arwenHeadshot.png"
 import yutakaHeadshot from "../public/yutakaHeadshot.png"
 import muhaisHeadshot from "../public/muhaisHeadshot.png"
 import isabellaHeadshot from "../public/isabellaHeadshot.png"
