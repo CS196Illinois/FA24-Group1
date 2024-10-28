@@ -1,8 +1,10 @@
 /* makes navbar background*/
 .navbar {
   position: fixed;
-  top: 0; 
-  width: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
   font-family: 'Times New Roman';
   background-color: #e0af6ad7;
   color: #ffffff;

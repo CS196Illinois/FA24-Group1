@@ -1,13 +1,10 @@
-//Project/frontend/ViewPerson/ViewPerson.js
-import React, { useState } from 'react';
+import React from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 import styles from './ViewPerson.module.css';
-import EventPopup from './EventPopup';
-import Navbar from '../app/components/navbar';
+import Navbar from '../components/navbar';
 
 const ViewPerson = () => {
-  const [selectedEvent, setSelectedEvent] = useState(null);
-
   const events = [
     {
       id: 1,
@@ -82,45 +79,27 @@ const ViewPerson = () => {
       image: '/JohnnyGamingwithGrandma.jpg'
     }
   ];
-  const handleImageClick = (event) => {
-    setSelectedEvent(event);
-};
-
-const handleClosePopup = () => {
-    setSelectedEvent(null);
-};
-
-return (
-  <>
+  return (
+    <div className={styles.root}>
       <Navbar />
-    <div className={styles.container}>
-        <div className={styles.profile}>
-            <h2 className={styles.profileName}>Johnny Anderson</h2>
-            <img src="/Johnny.jpeg" alt="Profile" className={styles.profilePic} />
-            <p className={styles.profileInfo}><strong>Birthday:</strong> October 16, 2012</p>
-            <p className={styles.profileInfo}><strong>Home:</strong> Chicago, IL</p>
-        </div>
+      <div className={styles.container}>
+        <h1 className={styles.title}>Johnny's Life Events</h1>
         <div className={styles.eventsGrid}>
-            {events.map(event => (
-                <div key={event.id} className={styles.eventItem}>
-                    <div className={styles.imageWrapper} onClick={() => handleImageClick(event)}>
-                        <Image
-                            src={event.image}
-                            alt={event.title}
-                            className={styles.eventImage}
-                            layout="fill"
-                        />
-                    </div>
-                    <div className={styles.eventTitle}>{event.title}</div>
-                </div>
-            ))}
+          {events.map((event) => (
+            <div key={event.id} className={styles.eventCard}>
+              <div className={styles.eventImage}>
+                <Image src={event.image} alt={event.title} layout="fill" objectFit="cover" />
+              </div>
+              <div className={styles.eventContent}>
+                <h3>{event.title}</h3>
+                <p>{event.description}</p>
+              </div>
+            </div>
+          ))}
         </div>
-        {selectedEvent && (
-            <EventPopup event={selectedEvent} onClose={handleClosePopup} />
-        )}
+      </div>
     </div>
-    </>
-);
+  );
 };
 
 export default ViewPerson;
