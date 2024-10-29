@@ -42,7 +42,7 @@ export default function AboutPage() {
                 <p className = {styles.position}>Backend </p>
               </div>
               <div className = {`${styles.div6} ${styles.cells}`}>
-                <Image alt="headshot" src={muhaisHeadshot} className = {styles.headshot}/>
+                <Image alt="headshot" src={muhaisHeadshot} className = {styles.customHeadshot}/>
                 <p className = {styles.name}>Muhais Olatundun </p>
                 <p className = {styles.position}>Backend </p>
               </div>

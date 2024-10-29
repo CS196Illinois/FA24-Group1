@@ -1,10 +1,17 @@
+// Import necessary React and Next.js component
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+
+// Import CSS module for styling
 import styles from './ViewPerson.module.css';
+
+// Import custom Navbar component
 import Navbar from '../components/navbar';
 
-const ViewPerson = () => {
+// Define the ViewPerson component
+const ViewPerson = () => { 
+    // Define an array of event objects, each representing a life event for Johnny
   const events = [
     {
       id: 1,
@@ -12,6 +19,7 @@ const ViewPerson = () => {
       description: "Johnny's birth on October 16, 2012, was a joyous occasion. I remember holding him for the first time, marveling at his tiny fingers and toes.",
       image: '/JohnnyBorn.jpg'
     },
+    // ... more event objects ...
     {
       id: 2,
       title: 'Ducks at the Pond',
@@ -80,16 +88,22 @@ const ViewPerson = () => {
     }
   ];
   return (
+    // Return the JSX for the component
     <div className={styles.root}>
+      {/* Include the Navbar component */}
       <Navbar />
       <div className={styles.container}>
         <h1 className={styles.title}>Johnny's Life Events</h1>
+             {/* Create a grid to display the events */}
         <div className={styles.eventsGrid}>
+           {/* Map through the events array and create a card for each event */}
           {events.map((event) => (
             <div key={event.id} className={styles.eventCard}>
+                  {/* Display the event image */}
               <div className={styles.eventImage}>
                 <Image src={event.image} alt={event.title} layout="fill" objectFit="cover" />
               </div>
+              {/* Display the event title and description */}
               <div className={styles.eventContent}>
                 <h3>{event.title}</h3>
                 <p>{event.description}</p>
@@ -101,5 +115,6 @@ const ViewPerson = () => {
     </div>
   );
 };
+// Export the component for use in other parts of the application
 
 export default ViewPerson;
