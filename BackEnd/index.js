@@ -284,7 +284,7 @@ app.get('/comments', async (req, res) => {
     }
 });
 // Start the server
-const port = 3003
+const port = 3000
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })
