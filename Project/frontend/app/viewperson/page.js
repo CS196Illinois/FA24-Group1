@@ -6,8 +6,6 @@ import Image from 'next/image';
 // Import CSS module for styling
 import styles from './ViewPerson.module.css';
 
-// Import custom Navbar component
-import Navbar from '../components/navbar';
 
 // Define the ViewPerson component
 const ViewPerson = () => { 
@@ -91,7 +89,7 @@ const ViewPerson = () => {
     // Return the JSX for the component
     <div className={styles.root}>
       {/* Include the Navbar component */}
-      <Navbar />
+
       <div className={styles.container}>
         <h1 className={styles.title}>Johnny's Life Events</h1>
              {/* Create a grid to display the events */}

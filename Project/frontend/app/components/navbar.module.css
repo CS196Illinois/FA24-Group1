@@ -29,14 +29,6 @@ div.navbarLeft {
   align-items: center; /* Vertically centers items */
 }
 
-/* Styles for the center section of the navbar */
-div.navbarCenter {
-  margin-left: 450px; /* Pushes the center section to the right */
-  position: relative;
-  display: flex;
-  float: center;
-}
-
 /* Styles for the right section of the navbar */
 div.navbarRight {
   display: flex;
