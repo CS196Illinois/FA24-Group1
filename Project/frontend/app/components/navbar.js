@@ -42,7 +42,7 @@ const Navbar = () => {
       </li>
        {/* View Person page link */}
       <li>
-          <Link href="/viewperson">View Person</Link>
+          <Link href="/ViewPerson">View Person</Link>
       </li>
     </ul>
      {/* Second set of navigation links */}
