@@ -3,7 +3,11 @@ import Image from "next/image";
 import dummyHeadshot from "../public/headshot-dummy.jpg";
 import graceHeadshot from "../public/graceHeadshot.jpg";
 import colinHeadshot from "../public/colinHeadshot.jpg";
-import arwenHeadshot from "../public/arwenHeadshot.jpg";
+import kevinHeadshot from "../public/kevinHeadshot.png"
+import arwenHeadshot from "../public/arwenHeadshot.png"
+import yutakaHeadshot from "../public/yutakaHeadshot.png"
+import muhaisHeadshot from "../public/muhaisHeadshot.png"
+import isabellaHeadshot from "../public/isabellaHeadshot.png"
 
 export default function AboutPage() {
     return (
@@ -28,22 +32,22 @@ export default function AboutPage() {
                 <p className = {styles.position}>Frontend </p>
               </div>
               <div className = {`${styles.div4} ${styles.cells}`}>
-                <Image alt="headshot" src={dummyHeadshot} className = {styles.headshot}/>
+                <Image alt="headshot" src={isabellaHeadshot} className = {styles.headshot}/>
                 <p className = {styles.name}>Isabella Marquez </p>
                 <p className = {styles.position}>Frontend </p>
               </div>
               <div className = {`${styles.div5} ${styles.cells}`}>
-                <Image alt="headshot" src={dummyHeadshot} className = {styles.headshot}/>
+                <Image alt="headshot" src={kevinHeadshot} className = {styles.headshot}/>
                 <p className = {styles.name}>Kevin Hwang </p>
                 <p className = {styles.position}>Backend </p>
               </div>
               <div className = {`${styles.div6} ${styles.cells}`}>
-                <Image alt="headshot" src={dummyHeadshot} className = {styles.headshot}/>
+                <Image alt="headshot" src={muhaisHeadshot} className = {styles.customHeadshot}/>
                 <p className = {styles.name}>Muhais Olatundun </p>
                 <p className = {styles.position}>Backend </p>
               </div>
               <div className = {`${styles.div7} ${styles.cells}`}>
-                <Image alt="headshot" src={dummyHeadshot} className = {styles.headshot}/>
+                <Image alt="headshot" src={yutakaHeadshot} className = {styles.headshot}/>
                 <p className = {styles.name}>Yutaka Gomi </p>
                 <p className = {styles.position}>Frontend </p>
               </div>
