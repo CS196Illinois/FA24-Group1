@@ -1,9 +1,13 @@
-import styles from './page.module.css';
+import styles from './loading.module.css';
 
 function Loading() {
-    return <div className={styles.background}>
-        <p1 className = {styles.loading}> Loading... </p1>
-    </div> ;
+    return <div className = {styles.all}>
+        <div className={styles.dots}></div>
+        <div className={styles.dots}></div>
+        <div className={styles.dots}></div>
+        <div className={styles.dots}></div>
+        <div className={styles.dots}></div>
+    </div>;
 }
 
 export default Loading;
