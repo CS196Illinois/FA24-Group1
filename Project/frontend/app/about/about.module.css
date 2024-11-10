@@ -84,6 +84,16 @@
     aspect-ratio: 1 / 1;
 }
 
+.customHeadshot {
+    width: 80%;
+    height: auto;
+    margin: 50px 10% 50px 10%;    
+    border-radius: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    object-position: center 20%;
+}
+
 .name {
     color: #ffffff;
     font-weight:bolder; 
