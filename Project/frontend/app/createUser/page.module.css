@@ -12,11 +12,11 @@
 }
 
 .box {
-    font-family: 'Roboto', arial, sans-serif;
+    font-family: 'Times New Roman';
     width: 40%;
     background-color: #e5bb7f75;
     margin: 0 30% 0 30%;
-    height: 550px;
+    height: 450px;
     border-radius: 10px;
     color: #ffffff;
 }
@@ -53,41 +53,21 @@
     border: none;
 }
 
-.signIn {
+.createUser {
     display: block;
     text-align: center;
     padding: 14px 16px;
     border-radius: 25px;
     font-size: 20px;
     background-color: #e9c694;
-    margin: 20px auto;
+    color: #ffffff; /* Ensures text is readable on button */
+    margin: 0 20% 0 20%;
     font-weight: bold;
-    color: #1f1f1f;
-    width: 60%;
     cursor: pointer;
-    text-decoration: none;
+    transition: background-color 0.3s ease; /* Smooth hover effect */
 }
 
-.googleSignIn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #e9c694;
-    color: #1f1f1f;
-    padding: 14px 16px;
-    border-radius: 25px;
-    font-size: 20px;
-    font-weight: bold;
-    text-decoration: none;
-    margin: 10px auto; /* Adds space between the two buttons */
-    width: 60%;
-    cursor: pointer;
+.getRid {
+    margom:
 }
-
-.googleButtonContainer {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px; /* Adjust as needed */
-}
-
 
