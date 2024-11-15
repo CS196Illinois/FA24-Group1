@@ -1,22 +1,32 @@
 // Import required modules
 const express = require('express');
-const passport = require('passport');
+const multer = require('multer');
 const session = require('express-session');
-const { handleGoogleLogin, getMemoriesByUserId, getUserByGoogleId } = require('./dbFunctions');
-const { User, Memory, Comment } = require('./models'); // Import database models
-require('dotenv').config(); // Load environment variables from .env file
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+require('dotenv').config();
+const {
+    createPerson,
+    getPeopleByUserId,
+    editPerson,
+    deletePerson,
+    deleteMemory,
+    handleGoogleLogin,
+    getUserByGoogleId
+} = require('./dbFunctions');
 
-const app = express(); // Initialize Express application
+const app = express();
+const upload = multer({ dest: 'uploads/' }); // Configure multer for handling file uploads
 
-// Middleware setup
-app.use(express.json()); // Middleware to parse JSON requests
+// Middleware to parse JSON requests and manage sessions
+app.use(express.json());
 app.use(session({
-    secret: 'your_session_secret', // Secret key to sign session ID cookies, should be secured in production
-    resave: false, // Prevents session resaving if nothing changed
-    saveUninitialized: true // Allows saving uninitialized sessions
+    secret: 'your_session_secret', // Secret key for signing session cookies
+    resave: false, // Prevent resaving sessions if not modified
+    saveUninitialized: true // Allow uninitialized sessions to be saved
 }));
-app.use(passport.initialize()); // Initialize Passport for authentication handling
-app.use(passport.session()); // Enable persistent login sessions
+app.use(passport.initialize()); // Initialize Passport for authentication
+app.use(passport.session()); // Enable session handling for Passport
 
 // Google authentication strategy setup
 passport.use(new GoogleStrategy({
@@ -38,87 +48,112 @@ passport.serializeUser((user, done) => done(null, user.googleId));
 
 // Deserialize user from session: retrieves full user info using user ID
 passport.deserializeUser(async (googleId, done) => {
-    const user = await getUserByGoogleId(googleId); // Retrieve user from database by Google ID
-    done(null, user); // Pass retrieved user object to done callback
+    try {
+        const user = await getUserByGoogleId(googleId); // Retrieve user from database by Google ID
+        done(null, user); // Pass retrieved user object to done callback
+    } catch (error) {
+        done(error, null); // Handle errors during deserialization
+    }
 });
 
-// Route to initiate Google login flow
+// Middleware to ensure the user is authenticated
+function isAuthenticated(req, res, next) {
+    if (!req.isAuthenticated()) {
+        return res.status(401).send('Unauthorized'); // Block unauthenticated users
+    }
+    next(); // Allow access if authenticated
+}
+
+// Route: Initiate Google login
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-// Callback route after Google login completes
+// Route: Handle Google login callback
 app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
-    // Redirect to list of people (albums) after successful authentication
-    res.redirect('/listOfPeople');
+    res.redirect('/dashboard'); // Redirect to the dashboard after successful login
 });
 
-// Route to display a list of people who have created albums (memories)
-// This route represents the "listOfPeople" page where users see all other users with albums
-app.get('/listOfPeople', async (req, res) => {
-    // Ensure the user is authenticated before allowing access
-    if (!req.isAuthenticated()) {
-        return res.status(401).send('Unauthorized'); // Send Unauthorized status if user is not authenticated
-    }
-
-    try {
-        // Retrieve all users and select only their names and profile pictures
-        const users = await User.find().select('name profilePicture'); 
-        res.json(users); // Send list of users as JSON response
-    } catch (error) {
-        res.status(500).send('Error retrieving list of people'); // Handle potential errors
-    }
+// Route: Dashboard page
+app.get('/dashboard', isAuthenticated, (req, res) => {
+    res.send(`Welcome, ${req.user.name}! <a href="/people">View People</a> | <a href="/logout">Logout</a>`);
 });
 
-// Route to display details of a person's album (memories) by user ID
-// This route represents the "viewPerson" page where users can view memories associated with a specific person
-app.get('/viewPerson/:userId', async (req, res) => {
-    // Ensure the user is authenticated before allowing access
-    if (!req.isAuthenticated()) {
-        return res.status(401).send('Unauthorized'); // Send Unauthorized status if user is not authenticated
-    }
-
-    try {
-        // Retrieve all memories created by the specified user
-        const memories = await getMemoriesByUserId(req.params.userId);
-        res.json(memories); // Send list of memories as JSON response
-    } catch (error) {
-        res.status(500).send('Error retrieving memories for user'); // Handle potential errors
-    }
-});
-
-// Dashboard route (home page after login)
-// This route is a simple dashboard that redirects the user to the album list or offers logout
-app.get('/dashboard', (req, res) => {
-    // Check if user is authenticated
-    if (req.isAuthenticated()) {
-        // If authenticated, display a welcome message and link to view albums
-        res.send(`Welcome to your dashboard, ${req.user.name}! <a href="/listOfPeople">View Albums</a> | <a href="/logout">Logout</a>`);
-    } else {
-        // If not authenticated, redirect to Google login
-        res.redirect('/auth/google');
-    }
-});
-
-// Route to log out the user and end the session
+// Route: Logout user
 app.get('/logout', (req, res) => {
-    req.logout(function(err) {
-        if (err) { return next(err); } // Handle logout errors
-        res.redirect('/'); // Redirect to home page after successful logout
+    req.logout(err => {
+        if (err) return res.status(500).send('Error logging out');
+        res.redirect('/'); // Redirect to the homepage after logout
     });
 });
 
-// Home route (landing page before login)
-// Displays a welcome message and link to Google login if the user is not authenticated
+// Route: Homepage
 app.get('/', (req, res) => {
     if (req.isAuthenticated()) {
-        res.redirect('/dashboard'); // Redirect authenticated users to dashboard
-    } else {
-        // Display login link for non-authenticated users
-        res.send('Welcome! <a href="/auth/google">Login with Google</a>');
+        return res.redirect('/dashboard'); // Redirect authenticated users to the dashboard
+    }
+    res.send('<a href="/auth/google">Login with Google</a>'); // Show login link for unauthenticated users
+});
+
+// Route to create a new person
+app.post('/createPerson', isAuthenticated, upload.single('profilePicture'), async (req, res) => {
+    try {
+        const userId = req.user._id; // Retrieve logged-in user ID
+        const { name } = req.body; // Extract name from request body
+        const profilePicture = req.file ? `/uploads/${req.file.filename}` : null; // Save uploaded profile picture
+        const person = await createPerson(userId, name, profilePicture); // Create person
+        res.json(person); // Respond with created person data
+    } catch (error) {
+        res.status(500).send('Error creating person'); // Handle errors
     }
 });
 
-// Server setup and start listening on specified port
-const port = 3000; // Define the port the server will listen on
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`); // Log server start information
+// Route to edit an existing person
+app.put('/editPerson/:personId', isAuthenticated, upload.single('profilePicture'), async (req, res) => {
+    try {
+        const { personId } = req.params; // Extract person ID from route parameters
+        const updates = {
+            name: req.body.name, // Update name if provided
+            ...(req.file && { profilePicture: `/uploads/${req.file.filename}` }) // Update profile picture if provided
+        };
+        const person = await editPerson(personId, updates); // Update person details
+        res.json(person); // Respond with updated person data
+    } catch (error) {
+        res.status(500).send('Error editing person'); // Handle errors
+    }
 });
+
+// Route to retrieve all people created by the logged-in user
+app.get('/people', isAuthenticated, async (req, res) => {
+    try {
+        const userId = req.user._id; // Retrieve logged-in user ID
+        const people = await getPeopleByUserId(userId); // Fetch people
+        res.json(people); // Respond with people data
+    } catch (error) {
+        res.status(500).send('Error retrieving people'); // Handle errors
+    }
+});
+
+// Route to delete a person and all associated data
+app.delete('/deletePerson/:personId', isAuthenticated, async (req, res) => {
+    try {
+        const { personId } = req.params; // Extract person ID
+        await deletePerson(personId); // Delete person and associated data
+        res.send(`Person with ID ${personId} deleted`); // Confirm deletion
+    } catch (error) {
+        res.status(500).send('Error deleting person'); // Handle errors
+    }
+});
+
+// Route to delete a memory and associated comments
+app.delete('/deleteMemory/:memoryId', isAuthenticated, async (req, res) => {
+    try {
+        const { memoryId } = req.params; // Extract memory ID
+        await deleteMemory(memoryId); // Delete memory and associated comments
+        res.send(`Memory with ID ${memoryId} deleted`); // Confirm deletion
+    } catch (error) {
+        res.status(500).send('Error deleting memory'); // Handle errors
+    }
+});
+
+// Start the server
+const port = 3000; // Define the server port
+app.listen(port, () => console.log(`Server running on http://localhost:${port}`));
