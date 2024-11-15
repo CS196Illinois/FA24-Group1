@@ -1,36 +1,44 @@
-// Import mongoose library to interact with MongoDB
+// Import mongoose library for database modeling
 const mongoose = require('mongoose');
 
-// Define User Schema to store user details
+// User Schema: Represents the user logging in through Google OAuth
 const userSchema = new mongoose.Schema({
-    googleId: { type: String, required: true, unique: true }, // Google ID, unique identifier for each user from Google OAuth
-    email: { type: String, required: true, unique: true }, // User's email address, must be unique
-    name: { type: String, required: true }, // User's display name from Google profile
-    profilePicture: { type: String } // URL of the user's profile picture from Google
+    googleId: { type: String, required: true, unique: true }, // Unique Google ID for the user
+    email: { type: String, required: true, unique: true }, // Email address of the user
+    name: { type: String, required: true }, // Display name of the user
+    profilePicture: { type: String } // Profile picture URL from Google profile
 });
 
-// Define Memory Schema to store user memories (albums)
-// Each memory is associated with a specific user and contains a title, description, and creation date
+// Memory Schema: Represents memories (albums) uploaded by users
 const memorySchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Reference to the User who created this memory
-    title: { type: String, required: true }, // Title of the memory/album, required field
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Link memory to a specific user
+    personId: { type: mongoose.Schema.Types.ObjectId, ref: 'Person' }, // Optional link to a person this memory belongs to
+    title: { type: String, required: true }, // Title of the memory
     description: { type: String }, // Optional description of the memory
-    createdAt: { type: Date, default: Date.now } // Date the memory was created, defaults to current date
+    createdAt: { type: Date, default: Date.now } // Timestamp when the memory was created
 });
 
-// Define Comment Schema to store comments on memories
-// Each comment is associated with a specific memory and user, and includes the comment text and creation date
+// Comment Schema: Represents comments on memories
 const commentSchema = new mongoose.Schema({
-    memoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Memory', required: true }, // Reference to the Memory this comment belongs to
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Reference to the User who created the comment
-    text: { type: String, required: true }, // The actual comment text, required field
-    createdAt: { type: Date, default: Date.now } // Date the comment was created, defaults to current date
+    memoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Memory', required: true }, // Link comment to a memory
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Link comment to the user who created it
+    text: { type: String, required: true }, // Text of the comment
+    createdAt: { type: Date, default: Date.now } // Timestamp when the comment was created
 });
 
-// Create models from schemas to interact with MongoDB collections
-const User = mongoose.model('User', userSchema); // Model for User collection
-const Memory = mongoose.model('Memory', memorySchema); // Model for Memory collection
-const Comment = mongoose.model('Comment', commentSchema); // Model for Comment collection
+// Person Schema: Represents "people" associated with a user's memories
+const personSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Link person to a specific user
+    name: { type: String, required: true }, // Name of the person
+    profilePicture: { type: String }, // Profile picture URL for the person
+    createdAt: { type: Date, default: Date.now } // Timestamp when the person was created
+});
 
-// Export models to use in other parts of the application
-module.exports = { User, Memory, Comment };
+// Models for interacting with the respective collections in MongoDB
+const User = mongoose.model('User', userSchema);
+const Memory = mongoose.model('Memory', memorySchema);
+const Comment = mongoose.model('Comment', commentSchema);
+const Person = mongoose.model('Person', personSchema);
+
+// Export the models to use them in other parts of the application
+module.exports = { User, Memory, Comment, Person };
