@@ -1,67 +1,70 @@
 // Description: Main entry point for the application.
 const express = require('express')
 const { MongoClient } = require("mongodb");
+const { OAuth2Client } = require('google-auth-library');
 const app = express()
+
+const client = new OAuth2Client();
 
 // Added this line to parse JSON bodies
 app.use(express.json());
 
 // Define the MongoDB URI
 const uri = "mongodb://localhost:27017/local";
-const client = new MongoClient(uri);
+const mongoClient = new MongoClient(uri);
 
 // Retrieve the data from the collections(User, Memory, Comment)
 async function retrieveUser() {
     try {
-        await client.connect(); // Ensure the client is connected
+        await mongoClient.connect(); // Ensure the client is connected
 
-        const database = client.db('local');
+        const database = mongoClient.db('local');
 
         const users = database.collection('User');  // Find all of the users in the collection
         const userList = await users.find().toArray();
         console.log(userList);
         return userList;
     } finally {
-        await client.close(); // Ensures that the client will close when you finish/error
+        await mongoClient.close(); // Ensures that the client will close when you finish/error
     }
 }
 
 async function retrieveMemory() {
     try {
-        await client.connect();
+        await mongoClient.connect();
 
-        const database = client.db('local');
+        const database = mongoClient.db('local');
 
         const memories = database.collection('Memory');
         const memoryList = await memories.find().toArray();
         console.log(memoryList);
         return memoryList;
     } finally {
-        await client.close();
+        await mongoClient.close();
     }
 }
 
 async function retrieveComment() {
     try {
-        await client.connect();
+        await mongoClient.connect();
 
-        const database = client.db('local');
+        const database = mongoClient.db('local');
 
         const comments = database.collection('Comment');
         const commentList = await comments.find().toArray();
         console.log(commentList);
         return commentList;
     } finally {
-        await client.close();
+        await mongoClient.close();
     }
 }
 
 // Add a data for the collections
 async function addUser(username) {
     try {
-        await client.connect();
+        await mongoClient.connect();
 
-        const database = client.db('local');
+        const database = mongoClient.db('local');
 
         const users = database.collection('User');  
         
@@ -75,15 +78,15 @@ async function addUser(username) {
         const result = await users.insertOne(doc);
         console.log(`A document was inserted with the _id: ${result.insertedId}`);
     } finally {
-        await client.close();
+        await mongoClient.close();
     }
 }
 
 async function addMemory(userID, description, title, isPhoto, tags, accessLevel) {
     try {
-        await client.connect();
+        await mongoClient.connect();
 
-        const database = client.db('local');
+        const database = mongoClient.db('local');
 
         const memories = database.collection('Memory');  
         
@@ -104,15 +107,15 @@ async function addMemory(userID, description, title, isPhoto, tags, accessLevel)
         const result = await memories.insertOne(doc);
         console.log(`A document was inserted with the _id: ${result.insertedId}`);
     } finally {
-        await client.close();
+        await mongoClient.close();
     }
 }
 
 async function addComment(memoryID, userID, text) {
     try {
-        await client.connect();
+        await mongoClient.connect();
 
-        const database = client.db('local');
+        const database = mongoClient.db('local');
 
         const comments = database.collection('Comment');  
         
@@ -127,7 +130,25 @@ async function addComment(memoryID, userID, text) {
         const result = await comments.insertOne(doc);
         console.log(`A document was inserted with the _id: ${result.insertedId}`);
     } finally {
-        await client.close();
+        await mongoClient.close();
+    }
+}
+
+// Google Sign-In verification
+async function verify(token) {
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: 'YOUR_GOOGLE_CLIENT_ID',  // Replace with your actual Client ID
+        });
+
+        const payload = ticket.getPayload();
+        const userId = payload['sub'];  // Google user ID
+        console.log('Verified user ID:', userId);
+        return payload;  // Return the full payload to use further, such as email, name, etc.
+    } catch (error) {
+        console.error('Error verifying Google ID token:', error);
+        throw new Error('Authentication failed');
     }
 }
 
@@ -139,7 +160,7 @@ app.get('/', (req, res) => {
 // Route of '/data' to retrieve all the data from the collections
 app.get('/data', async (req, res) => {
     try {
-        await client.connect(); // Ensure the client is connected
+        await mongoClient.connect(); // Ensure the client is connected
 
         // Retrieve all data from the collections
         const userList = await retrieveUser();
@@ -156,45 +177,9 @@ app.get('/data', async (req, res) => {
         // Send the combined data as a JSON response
         res.json(data);
     } finally {
-        await client.close();
+        await mongoClient.close();
     }
 }); 
-
-/*// Route to add a user and test the addUser function
-app.get('/addUser', async (req, res) => {
-    try {
-        await client.connect();
-        await addUser('testUser');
-        res.send('User added successfully');
-    } finally {
-        await client.close();
-    }
-});
-*/
-
-/*// Route to add a Memory and test the addMemory function
-app.get('/addMemory', async (req, res) => {
-    try {
-        await client.connect();
-        await addMemory('testUserID', 'testDescription', 'testTitle', true, ['testTag1', 'testTag2'], '0');
-        res.send('Memory added successfully');
-    } finally {
-        await client.close();
-    }
-});
-*/
-
-/*// Route to add a Memory and test the addMemory function
-app.get('/addComment', async (req, res) => {
-    try {
-        await client.connect();
-        await addComment('testMemoryID', 'testUserID', 'testText');
-        res.send('Comment added successfully');
-    } finally {
-        await client.close();
-    }
-});
-*/
 
 // New User Endpoints
 // Creating a new user
@@ -283,6 +268,36 @@ app.get('/comments', async (req, res) => {
         res.status(500).send('Error retrieving comments');
     }
 });
+
+// Google Sign-In Endpoint
+app.post('/auth/google', async (req, res) => {
+    const { token } = req.body; // Get the Google ID token from the client request
+    try {
+        const userPayload = await verifyGoogleToken(token);  // Verify the token
+        const googleID = userPayload['sub'];
+        
+        // Optionally, find the user in your database or create a new one
+        let user = await findUserByGoogleID(googleID);
+
+        if (!user) {
+            const newUserId = await addUserWithGoogleData(googleID, userPayload);
+            user = { _id: newUserId, googleID: googleID, email: userPayload.email, name: userPayload.name };
+        }
+
+        // Return the user data after successful authentication
+        res.json({
+            message: 'User authenticated successfully',
+            user: {
+                id: user._id,
+                email: user.email,
+                name: user.name
+            }
+        });
+    } catch (error) {
+        res.status(500).send('Authentication failed');
+    }
+});
+
 // Start the server
 const port = 3000
 app.listen(port, () => {
