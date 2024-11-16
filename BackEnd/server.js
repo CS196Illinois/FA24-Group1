@@ -5,6 +5,7 @@ const session = require('express-session');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 require('dotenv').config();
+const { verifyIdToken } = require('./auth');
 const {
     createPerson,
     getPeopleByUserId,
@@ -18,7 +19,7 @@ const {
 const app = express();
 const upload = multer({ dest: 'uploads/' }); // Configure multer for handling file uploads
 
-// Middleware to parse JSON requests and manage sessions
+// siddleware to parse JSON requests and manage sessions
 app.use(express.json());
 app.use(session({
     secret: 'your_session_secret', // Secret key for signing session cookies
@@ -151,6 +152,29 @@ app.delete('/deleteMemory/:memoryId', isAuthenticated, async (req, res) => {
         res.send(`Memory with ID ${memoryId} deleted`); // Confirm deletion
     } catch (error) {
         res.status(500).send('Error deleting memory'); // Handle errors
+    }
+});
+
+app.post('/tokensignin', async (req, res) => {
+    const idToken = req.body.idtoken; // Get token from request body
+
+    try {
+        const { userId, payload } = await verifyIdToken(idToken);
+        let user = await findUserByGoogleId(userId);
+        
+        req.session.userId = user._id;
+        if (!user) {
+            user = await createUserFromPayload(payload);
+        }
+        console.log('Authenticated user:', user);
+        res.status(200).json({
+            message: 'Authentication successful!',
+            userId: user.userId,
+            userInfo: user.payload
+        });
+    } catch (error) {
+        console.error('Error authenticating user:', error);
+        res.status(401).send('Authentication failed!');
     }
 });
 

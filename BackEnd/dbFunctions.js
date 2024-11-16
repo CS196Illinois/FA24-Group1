@@ -1,5 +1,5 @@
 // Import models to interact with database collections
-const { User, Memory, Comment, Person } = require('./models');
+const { User, Memory, Comment, Person } = require('./model');
 
 // Function to handle Google login or user creation
 // Ensures a user is created if they don't already exist in the database
