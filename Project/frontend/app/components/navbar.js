@@ -55,10 +55,15 @@ const Navbar = () => {
       </li>
       {/* Create or Edit Person page link */}
       <li>
-        <Link href="/createUser" className = {styles.item}>
+        <Link href="/CreateEdit" className = {styles.item}>
           Create or Edit Person
         </Link>
       </li>
+      <li>
+        <Link href="/Profile" className={styles.item}>
+         Profile
+        </Link>
+    </li>
     </ul>
   </div>
 

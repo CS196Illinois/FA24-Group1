@@ -13,6 +13,21 @@
     
 }
 
+.editButton {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #bd954f92;
+    color: rgb(13, 1, 1);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .editButton:hover {
+    background-color: #dba156;
+  }
+
 .background {
     background-image: url(../public/aboutpage.png);
     height: 100vh;
