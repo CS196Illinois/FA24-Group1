@@ -1,5 +1,5 @@
 // Import models to interact with database collections
-const { User, Memory, Comment, Person } = require('./model');
+const { User, Memory, Comment, Person } = require('./models');
 
 // Function to retrieve a user by their Google ID
 // This is used for session deserialization in Passport.js
