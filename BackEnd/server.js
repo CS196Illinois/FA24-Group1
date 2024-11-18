@@ -1,200 +1,385 @@
-// Import required modules
 const express = require('express');
-const mongoose = require('mongoose');
-require('dotenv').config();
-
 const session = require('express-session');
 const passport = require('passport');
+const mongoose = require('mongoose');
+const { OAuth2Client } = require('google-auth-library');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-require('dotenv').config();
-const { verifyIdToken } = require('./auth');
+const fetch = require('node-fetch');
+const { User, Memory, Person } = require('./models');
+const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
 const multer = require('multer');
 
-// Import database functions
-const {
-    getUserByGoogleId,
-    handleGoogleLogin,
-    createPerson,
-    getPeopleByUserId,
-    editPerson,
-    deletePerson,
-    deleteMemory
-} = require('./dbFunctions');
-
-// Initialize Express App
 const app = express();
-const upload = multer({ dest: 'uploads/' }); // Configure multer for file uploads
+const port = process.env.PORT || 3000;
 
-// MongoDB Connection
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => {
-        console.error('Error connecting to MongoDB:', err);
-        process.exit(1); // Exit if unable to connect
-    });
+const CLIENT_ID = 'INSERT';
+const CLIENT_SECRET = 'INSERT';
+const client = new OAuth2Client(CLIENT_ID);
 
-// siddleware to parse JSON requests and manage sessions
+// Middleware Setup
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:3001'],
+  credentials: true
+}));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'default_session_secret',
-    resave: false,
-    saveUninitialized: true
+  secret: process.env.SESSION_SECRET || 'your_session_secret',
+  resave: false,
+  saveUninitialized: false
 }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Google Authentication Strategy Setup
-passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/auth/google/callback"
-}, async (accessToken, refreshToken, profile, done) => {
-    try {
-        const user = await handleGoogleLogin(profile);
-        done(null, user);
-    } catch (error) {
-        done(error, null);
-    }
-}));
 
-// Passport Serialization and Deserialization
-passport.serializeUser((user, done) => done(null, user.googleId)); // Serialize user to session
-passport.deserializeUser(async (googleId, done) => {
-    try {
-        const user = await getUserByGoogleId(googleId);
-        done(null, user);
-    } catch (error) {
-        done(error, null);
-    }
-});
+// Define the path to the uploads directory
+const uploadDir = path.join(__dirname, 'uploads');
 
-// Middleware to ensure user is authenticated
-function isAuthenticated(req, res, next) {
-    if (!req.isAuthenticated()) {
-        return res.status(401).send('Unauthorized');
-    }
-    next();
+// Ensure the uploads directory exists
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Routes
+// Configure multer storage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
 
-// Home Route
-app.get('/', (req, res) => {
-    if (req.isAuthenticated()) {
-        return res.redirect('/dashboard');
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+const upload = multer({ storage: storage });
+
+// Authentication middleware
+const isAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.status(401).json({ message: 'Unauthorized' });
+};
+
+// Apply authentication middleware to all /api routes
+app.use('/api', isAuthenticated);
+
+// Google authentication strategy setup
+passport.use(new GoogleStrategy({
+  clientID: CLIENT_ID,
+  clientSecret: CLIENT_SECRET,
+  callbackURL: "INSERT",
+  scope: ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    let user = await User.findOne({ googleId: profile.id });
+    if (!user) {
+      user = new User({
+        googleId: profile.id,
+        name: profile.displayName,
+        email: profile.emails[0].value,
+        profilePicture: profile.photos[0].value
+      });
+      await user.save();
     }
-    res.send('<a href="/auth/google">Login with Google</a>');
+    return done(null, user);
+  } catch (error) {
+    return done(error, null);
+  }
+}));
+
+passport.serializeUser((user, done) => done(null, user.id));
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (err) {
+    done(err, null);
+  }
 });
 
-// Google Login and Callback
-app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
-    res.redirect('/dashboard');
-});
-
-// Dashboard Route
-app.get('/dashboard', isAuthenticated, (req, res) => {
-    res.send(`Welcome, ${req.user.name}! <a href="/people">View People</a> | <a href="/logout">Logout</a>`);
-});
-
-// Logout Route
-app.get('/logout', (req, res) => {
-    req.logout(err => {
-        if (err) return res.status(500).send('Error logging out');
-        res.redirect('/');
+async function verifyGoogleIdToken(idToken) {
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: idToken,
+      audience: CLIENT_ID,
     });
+    const payload = ticket.getPayload();
+    return payload;
+  } catch (error) {
+    console.error('Error verifying ID token:', error);
+    throw error;
+  }
+}
+
+// Mongoose connection setup
+const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/yourDatabaseName';
+mongoose.connect(mongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => {
+  console.log('Connected to MongoDB');
+  app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+  });
+})
+.catch((err) => {
+  console.error('Error connecting to MongoDB:', err.message);
 });
 
-// People Management Routes
+// Routes
+// Google authentication routes
+app.get('/auth/google', passport.authenticate('google', {
+  scope: ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
+}));
+
+app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }),
+  (req, res) => {
+    res.redirect('/dashboard');
+  }
+);
+
+app.post('/api/auth/token', async (req, res) => {
+  const { code } = req.body;
+  const tokenUrl = 'https://oauth2.googleapis.com/token';
+  const params = new URLSearchParams({
+    code,
+    client_id: CLIENT_ID,
+    client_secret: CLIENT_SECRET,
+    redirect_uri: 'INSERT',
+    grant_type: 'authorization_code'
+  });
+
+  try {
+    const response = await fetch(tokenUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    });
+
+    if (!response.ok) {
+      return res.status(response.status).json({ error: 'Failed to exchange token' });
+    }
+
+    const data = await response.json();
+    const idToken = data.id_token;
+    const payload = await verifyGoogleIdToken(idToken);
+    res.status(200).json({ payload });
+  } catch (error) {
+    res.status(401).json({ error: 'Invalid ID token' });
+  }
+});
+
+app.get('/api/user-profile', (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  res.json(req.user);
+});
+
+app.get('/dashboard', (req, res) => {
+  if (req.isAuthenticated()) {
+    const host = req.headers.host.split(':')[0];
+    res.redirect(`http://${host}:3001/Profile`);
+  } else {
+    res.redirect('/auth/google');
+  }
+});
+
+app.get('/logout', (req, res) => {
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+    res.redirect('/');
+  });
+});
+
+app.get('/', (req, res) => {
+  if (req.isAuthenticated()) {
+    res.redirect('/dashboard');
+  } else {
+    res.send('Welcome! <a href="/auth/google">Login with Google</a>');
+  }
+});
 
 // Create a new person
-app.post('/createPerson', isAuthenticated, upload.single('profilePicture'), async (req, res) => {
-    try {
-        const userId = req.user._id;
-        const { name } = req.body;
-        const profilePicture = req.file ? `/uploads/${req.file.filename}` : null;
-        const person = await createPerson(userId, name, profilePicture);
-        res.json(person);
-    } catch (error) {
-        res.status(500).send('Error creating person');
+app.post('/api/people', upload.single('photo'), async (req, res) => {
+  const { name } = req.body;
+  const photo = req.file ? `http://localhost:3000/uploads/${req.file.filename}` : null;
+
+  if (!name) {
+    return res.status(400).json({ message: 'Name is required' });
+  }
+
+  try {
+    const newPerson = new Person({
+      name,
+      profilePicture: photo,
+      user: req.user._id
+    });
+    const savedPerson = await newPerson.save();
+    console.log('Person created successfully:', savedPerson);
+    res.status(201).json(savedPerson);
+  } catch (error) {
+    console.error('Error creating person:', error);
+    res.status(500).json({ message: 'Error creating person', error: error.message });
+  }
+});
+
+// Delete a person
+app.delete('/api/people/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const deletedPerson = await Person.findOneAndDelete({ _id: id, user: req.user._id });
+    if (!deletedPerson) {
+      return res.status(404).json({ message: 'Person not found' });
     }
+    console.log('Person deleted successfully:', deletedPerson);
+    res.status(200).json({ message: 'Person deleted successfully', deletedPerson });
+  } catch (error) {
+    console.error('Error deleting person:', error);
+    res.status(500).json({ message: 'Error deleting person', error });
+  }
 });
 
-// Edit an existing person
-app.put('/editPerson/:personId', isAuthenticated, upload.single('profilePicture'), async (req, res) => {
-    try {
-        const { personId } = req.params;
-        const updates = {
-            name: req.body.name,
-            ...(req.file && { profilePicture: `/uploads/${req.file.filename}` })
-        };
-        const person = await editPerson(personId, updates);
-        res.json(person);
-    } catch (error) {
-        res.status(500).send('Error editing person');
+// Delete all people for the authenticated user
+app.delete('/api/people', async (req, res) => {
+  try {
+    const result = await Person.deleteMany({ user: req.user._id });
+    res.status(200).json({ message: `${result.deletedCount} people deleted` });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete people' });
+  }
+});
+
+// Update a person's photo
+app.put('/api/people/:id/photo', upload.single('photo'), async (req, res) => {
+  const { id } = req.params;
+  const photo = req.file ? `http://localhost:3000/uploads/${req.file.filename}` : null;
+
+  if (!photo) {
+    return res.status(400).json({ message: 'Photo is required' });
+  }
+
+  try {
+    const updatedPerson = await Person.findOneAndUpdate(
+      { _id: id, user: req.user._id },
+      { profilePicture: photo },
+      { new: true }
+    );
+
+    if (!updatedPerson) {
+      return res.status(404).json({ message: 'Person not found' });
     }
+
+    res.status(200).json(updatedPerson);
+  } catch (error) {
+    console.error('Error updating profile picture:', error);
+    res.status(500).json({ message: 'Error updating profile picture', error });
+  }
 });
 
-// Get all people for the logged-in user
-app.get('/people', isAuthenticated, async (req, res) => {
-    try {
-        const userId = req.user._id;
-        const people = await getPeopleByUserId(userId);
-        res.json(people);
-    } catch (error) {
-        res.status(500).send('Error retrieving people');
+// Get all people for the authenticated user
+app.get('/api/people', async (req, res) => {
+  console.log('Received GET request to /api/people');
+  try {
+    const people = await Person.find({ user: req.user._id });
+    res.json(people);
+  } catch (error) {
+    console.error('Error fetching people:', error);
+    res.status(500).json({ message: 'Error fetching people', error: error.message });
+  }
+});
+
+// Add a memory to a person
+app.post('/api/people/:id/memories', upload.single('photo'), async (req, res) => {
+  const { id } = req.params;
+  const { title, comment } = req.body;
+  const photo = req.file ? `http://localhost:3000/uploads/${req.file.filename}` : null;
+
+  if (!title) {
+    return res.status(400).json({ message: 'Title is required' });
+  }
+
+  try {
+    const person = await Person.findOne({ _id: id, user: req.user._id });
+    if (!person) {
+      return res.status(404).json({ message: 'Person not found' });
     }
+
+    const newMemory = {
+      title,
+      photo,
+      comments: comment ? [{ text: comment }] : []
+    };
+
+    person.memories.push(newMemory);
+    await person.save();
+    res.status(201).json(person);
+  } catch (error) {
+    console.error('Error adding memory:', error);
+    res.status(500).json({ message: 'Error adding memory', error: error.message });
+  }
 });
 
-// Delete a person and all associated data
-app.delete('/deletePerson/:personId', isAuthenticated, async (req, res) => {
-    try {
-        const { personId } = req.params;
-        await deletePerson(personId);
-        res.send(`Person with ID ${personId} deleted`);
-    } catch (error) {
-        res.status(500).send('Error deleting person');
+// Add a comment to a memory
+app.post('/api/people/:id/memories/:memoryId/comments', async (req, res) => {
+  const { id, memoryId } = req.params;
+  const { text } = req.body;
+
+  if (!text) {
+    return res.status(400).json({ message: 'Comment text is required' });
+  }
+
+  try {
+    const person = await Person.findOne({ _id: id, user: req.user._id });
+    if (!person) {
+      return res.status(404).json({ message: 'Person not found' });
     }
-});
 
-// Memory Management Routes
-
-// Delete a memory and its associated comments
-app.delete('/deleteMemory/:memoryId', isAuthenticated, async (req, res) => {
-    try {
-        const { memoryId } = req.params;
-        await deleteMemory(memoryId);
-        res.send(`Memory with ID ${memoryId} deleted`);
-    } catch (error) {
-        res.status(500).send('Error deleting memory');
+    const memory = person.memories.id(memoryId);
+    if (!memory) {
+      return res.status(404).json({ message: 'Memory not found' });
     }
+
+    memory.comments.push({ text });
+    await person.save();
+    res.status(201).json(memory);
+  } catch (error) {
+    console.error('Error adding comment:', error);
+    res.status(500).json({ message: 'Error adding comment', error });
+  }
 });
 
-app.post('/tokensignin', async (req, res) => {
-    const idToken = req.body.idtoken; // Get token from request body
+// Delete a memory
+app.delete('/api/people/:id/memories/:memoryId', async (req, res) => {
+  const { id, memoryId } = req.params;
 
-    try {
-        const { userId, payload } = await verifyIdToken(idToken);
-        let user = await findUserByGoogleId(userId);
-        
-        req.session.userId = user._id;
-        if (!user) {
-            user = await createUserFromPayload(payload);
-        }
-        console.log('Authenticated user:', user);
-        res.status(200).json({
-            message: 'Authentication successful!',
-            userId: user.userId,
-            userInfo: user.payload
-        });
-    } catch (error) {
-        console.error('Error authenticating user:', error);
-        res.status(401).send('Authentication failed!');
+  try {
+    const person = await Person.findOne({ _id: id, user: req.user._id });
+    if (!person) {
+      return res.status(404).json({ message: 'Person not found' });
     }
+
+    const memory = person.memories.id(memoryId);
+    if (!memory) {
+      return res.status(404).json({ message: 'Memory not found' });
+    }
+
+    memory.remove();
+    await person.save();
+    res.status(200).json(person);
+  } catch (error) {
+    console.error('Error deleting memory:', error);
+    res.status(500).json({ message: 'Error deleting memory', error });
+  }
 });
 
-// Start the Server
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-});
+module.exports = app;

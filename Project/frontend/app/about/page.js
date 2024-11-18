@@ -34,7 +34,7 @@ export default function AboutPage() {
               <div className = {`${styles.div4} ${styles.cells}`}>
                 <Image alt="headshot" src={isabellaHeadshot} className = {styles.headshot}/>
                 <p className = {styles.name}>Isabella Marquez </p>
-                <p className = {styles.position}>Frontend </p>
+                <p className = {styles.position}>Frontend + Backend </p>
               </div>
               <div className = {`${styles.div5} ${styles.cells}`}>
                 <Image alt="headshot" src={kevinHeadshot} className = {styles.headshot}/>
