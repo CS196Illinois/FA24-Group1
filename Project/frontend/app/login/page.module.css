@@ -16,7 +16,7 @@
     width: 40%;
     background-color: #e5bb7f75;
     margin: 0 30% 0 30%;
-    height: 550px;
+    height: 600px;
     border-radius: 10px;
     color: #ffffff;
 }
@@ -90,4 +90,20 @@
     margin-top: 20px; /* Adjust as needed */
 }
 
+.logoutButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #d9534f; /* Red for logout */
+    color: #ffffff;
+    padding: 14px 16px;
+    border-radius: 25px;
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: none;
+    margin: 10px auto; /* Space between buttons and centering */
+    width: 60%;
+    cursor: pointer;
+}
 
+  
