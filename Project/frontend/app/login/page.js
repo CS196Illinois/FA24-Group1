@@ -6,6 +6,7 @@ import './button.css';
 import Image from "next/image";
 import LogoImg from "/public/Logo.png";
 import Link from 'next/link';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 require('dotenv').config({ path: '/../../../../.env' });
 
 export default function Login() {
@@ -63,7 +64,7 @@ export default function Login() {
               </div>
           </div>
         </div>
+        <GoogleOAuthProvider />
       </div>
-    </GoogleOAuthProvider>
-  );
+  )
 }
