@@ -1,0 +1,109 @@
+
+.photo {
+    background-image: url(../../public/dog.jpg);
+    height: 100vh;
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.pad {
+    padding-top: 100px; 
+}
+
+.box {
+    font-family: 'Roboto', arial, sans-serif;
+    width: 40%;
+    background-color: #e5bb7f75;
+    margin: 0 30% 0 30%;
+    height: 600px;
+    border-radius: 10px;
+    color: #ffffff;
+}
+
+.logoContainer {
+    padding: 5% 0 5% 0; 
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo {
+    height:50px;
+    width: auto;
+    padding-right: 20px;
+}
+
+.title {
+    font-size: 50px;
+    font-weight: bold;
+}
+
+.boxDes {
+    margin: 0 0 0 10%;
+    font-size: 30px;
+}
+
+.textBox {
+    margin: 10px 10% 40px 10%;
+    font-family: 'Times New Roman';
+    background-color: 	#edd1a96f;
+    font-size: 30px;
+    width: 80%;
+    border: none;
+}
+
+.signIn {
+    display: block;
+    text-align: center;
+    padding: 14px 16px;
+    border-radius: 25px;
+    font-size: 20px;
+    background-color: #e9c694;
+    margin: 20px auto;
+    font-weight: bold;
+    color: #1f1f1f;
+    width: 60%;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.googleSignIn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e9c694;
+    color: #1f1f1f;
+    padding: 14px 16px;
+    border-radius: 25px;
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: none;
+    margin: 10px auto; /* Adds space between the two buttons */
+    width: 60%;
+    cursor: pointer;
+}
+
+.googleButtonContainer {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px; /* Adjust as needed */
+}
+
+.logoutButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #d9534f; /* Red for logout */
+    color: #ffffff;
+    padding: 14px 16px;
+    border-radius: 25px;
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: none;
+    margin: 10px auto; /* Space between buttons and centering */
+    width: 60%;
+    cursor: pointer;
+}
+
+  
