@@ -5,12 +5,16 @@
   background-attachment: fixed;
   min-height: 100vh;
   padding: 100px 20px 20px; /* Increased top padding to 100px */
-  font-family: Arial, sans-serif;
+  font-family: 'Times New Roman';
 }
 
 .title {
   text-align: center;
   margin-bottom: 20px;
+  font-size: 3rem;
+  color: white;
+  background-color: #edd1a93d;
+  text-shadow: 2px, 2px, 2px, #e5bb7fbb;
 }
 
 .content {
