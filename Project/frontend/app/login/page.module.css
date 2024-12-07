@@ -1,109 +1,114 @@
-
 .photo {
-    background-image: url(../../public/dog.jpg);
+    background-image: url(../public/dog.jpg);
     height: 100vh;
     background-position: center top;
     background-repeat: no-repeat;
     background-size: cover;
-}
-
-.pad {
-    padding-top: 100px; 
-}
-
-.box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .box {
     font-family: 'Roboto', arial, sans-serif;
-    width: 40%;
-    background-color: #e5bb7f75;
-    margin: 0 30% 0 30%;
-    height: 600px;
+    width: 400px;
+    background-color: rgba(229, 187, 127, 0.75);
     border-radius: 10px;
+    padding: 30px;
     color: #ffffff;
+    text-align: center;
+  }
+  
+  .alreadyLoggedInContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .title {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .message {
+    font-size: 28px;
+    margin-top: 20px;
+  }
+  
+  .googleButtonContainer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .gsi-material-button {
+    width: auto;
+    max-width: 300px;
+  }
+
+  .google-sign-in-text {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 14px;  /* Adjust the size as needed */
+  font-weight: 500; /* Adjust the weight as needed */
+}
+
+  .background {
+    background-image: url(../public/dog.jpg);
+    height: 100vh;
+    background-attachment: fixed;
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.app {
+    padding-top: 5%;
+    padding-left: 2%;
+    padding-right: 2%;
+    text-align: center;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.loginBox {
+    background-color: rgba(203, 159, 97, 0.773);
+    border-radius: 8px;
+    padding: 40px;
+    text-align: center;
+    max-width: 400px;
+    margin: auto;
 }
 
 .logoContainer {
-    padding: 5% 0 5% 0; 
-    display:flex;
-    justify-content: center;
-    align-items: center;
+    margin-bottom: 20px;
 }
 
 .logo {
-    height:50px;
-    width: auto;
-    padding-right: 20px;
+    width: 100px;
+    height: 100px;
+    margin-bottom: 10px;
 }
 
 .title {
-    font-size: 50px;
-    font-weight: bold;
+    font-family: 'Times New Roman', serif;
+    color: #fff9f9;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
 }
 
-.boxDes {
-    margin: 0 0 0 10%;
-    font-size: 30px;
-}
-
-.textBox {
-    margin: 10px 10% 40px 10%;
-    font-family: 'Times New Roman';
-    background-color: 	#edd1a96f;
-    font-size: 30px;
-    width: 80%;
-    border: none;
-}
-
-.signIn {
-    display: block;
-    text-align: center;
-    padding: 14px 16px;
-    border-radius: 25px;
-    font-size: 20px;
-    background-color: #e9c694;
-    margin: 20px auto;
-    font-weight: bold;
-    color: #1f1f1f;
-    width: 60%;
-    cursor: pointer;
-    text-decoration: none;
-}
-
-.googleSignIn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #e9c694;
-    color: #1f1f1f;
-    padding: 14px 16px;
-    border-radius: 25px;
-    font-size: 20px;
-    font-weight: bold;
-    text-decoration: none;
-    margin: 10px auto; /* Adds space between the two buttons */
-    width: 60%;
-    cursor: pointer;
-}
-
-.googleButtonContainer {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px; /* Adjust as needed */
-}
-
-.logoutButton {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #d9534f; /* Red for logout */
+.message {
+    font-family: 'Times New Roman', serif;
     color: #ffffff;
-    padding: 14px 16px;
-    border-radius: 25px;
-    font-size: 20px;
-    font-weight: bold;
-    text-decoration: none;
-    margin: 10px auto; /* Space between buttons and centering */
-    width: 60%;
-    cursor: pointer;
+    font-size: 1.8rem;
+    margin-bottom: 10px;
 }
 
-  
+.subMessage {
+    font-family: 'Times New Roman', serif;
+    color: #eeeeee;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
