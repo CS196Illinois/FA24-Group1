@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import styles from "./navbar.module.css";
 import Image from "next/image";
-import LogoImg from "/public/Logo.png";
+import LogoImg from "../public/Logo.png";
 import './navbar.module.css';
 // This code defines a Navbar component using React
 

@@ -4,7 +4,10 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import userImg from '../public/addUser.png';
+import LogoImg from '../public/Logo.png';
 import styles from './friends.module.css';
+
+const API_BASE_URL = 'http://localhost:3000';
 
 const PersonIcon = ({ person, onDelete }) => {
   return (
@@ -12,7 +15,7 @@ const PersonIcon = ({ person, onDelete }) => {
       <div className={styles.imageContainer}>
         {person.profilePicture ? (
           <img
-            src={`http://localhost:3000${person.profilePicture.replace('http://localhost:3000', '')}`}
+            src={`${API_BASE_URL}${person.profilePicture.replace(API_BASE_URL, '')}`}
             alt={person.name}
             width={100}
             height={100}
@@ -25,7 +28,7 @@ const PersonIcon = ({ person, onDelete }) => {
         )}
       </div>
       <p>{person.name}</p>
-      <Link href={`/edit/${person._id}`}>
+      <Link href={`/CreateEdit/editPerson`}>
         <button className={styles.editButton}>Edit Person</button>
       </Link>
       <button className={styles.deleteButton} onClick={() => onDelete(person._id)}>Delete Person</button>
@@ -33,41 +36,57 @@ const PersonIcon = ({ person, onDelete }) => {
   );
 };
 
-
 const App = () => {
-  const [people, setPeople] = useState([]);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [people, setPeople] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchPeople();
+    const checkLoginStatus = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/user-profile`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+        });
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+          fetchPeople();
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.error('Error checking login status:', error);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    checkLoginStatus();
   }, []);
 
   const fetchPeople = async () => {
     try {
-      setLoading(true);
-      const response = await fetch('http://localhost:3000/api/people', {
+      const response = await fetch(`${API_BASE_URL}/api/people`, {
         method: 'GET',
         credentials: 'include'
       });
-      
       if (!response.ok) {
         throw new Error('Failed to fetch people');
       }
-
       const data = await response.json();
       setPeople(data);
     } catch (error) {
       console.error('Error fetching people:', error);
       setError(error.message);
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleDelete = async (personId) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/people/${personId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/people/${personId}`, {
         method: 'DELETE',
         credentials: 'include'
       });
@@ -82,32 +101,68 @@ const App = () => {
     }
   };
 
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const nextPerson = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % (people.length + 1));
+  };
+
+  const prevPerson = () => {
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + people.length + 1) % (people.length + 1));
+  };
+
   if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return (
+      <div className={styles.background}>
+        <div className={styles.app}>
+          <div className={styles.loginBox}>
+            <div className={styles.logoContainer}>
+              <Image src={LogoImg} alt="Memory Mosaic Logo" className={styles.logo} />
+              <h1 className={styles.title}>Memory Mosaic</h1>
+            </div>
+            <h2 className={styles.message}>Welcome!</h2>
+            <p className={styles.subMessage}>Please log in to continue</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
     return <div>Error: {error}</div>;
   }
 
-  return (
-    <div className={styles.background}>
-      <div className={styles.app}>
-        <div className={styles.iconGrid}>
-          {people.map((person) => (
-            <PersonIcon key={person._id} person={person} onDelete={handleDelete} />
-          ))}
+ return (
+<div className={styles.background}>
+  <div className={styles.app}>
+    <div className={styles.carousel}>
+      <button className={styles.arrowButton} onClick={prevPerson}>&lt;</button>
+      <div className={styles.carouselContent}>
+        {currentIndex < people.length ? (
+            <PersonIcon
+              key={people[currentIndex]._id}
+              person={people[currentIndex]}
+              onDelete={handleDelete}
+            />
+        ) : (
           <div className={styles.addIcon}>
-            <Link href="/createUser" className={styles.item}>
+            <Link href="/CreateEdit/createPerson" className={styles.item}>
               <div className={styles.imageContainer}>
                 <Image src={userImg} alt="Add User" className={styles.addIconPic} />
               </div>
               <p className={styles.text}>Add User</p>
             </Link>
           </div>
-        </div>
+        )}
       </div>
+      <button className={styles.arrowButton} onClick={nextPerson}>&gt;</button>
     </div>
+  </div>
+</div>
   );
 };
 

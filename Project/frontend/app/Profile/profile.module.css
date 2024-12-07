@@ -4,12 +4,21 @@
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    background-image: url(../public/mem.jpg);
+    font-family: 'Times New Roman';
+    background-image: url(../public/Welcome.png);
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
     color: white;
   }
+
+
+.semiTransparentBox {
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 20px; 
+  border-radius: 10px;
+  color: white; 
+}
   
   .welcome {
     font-size: 2.5rem;
@@ -50,10 +59,15 @@
     color: white;
     border: none;
     border-radius: 5px;
+    font-family: 'Times New Roman';
     cursor: pointer;
     transition: background-color 0.3s ease;
   }
   
   .logoutButton:hover {
     background-color: #ff3333;
+  }
+
+  .semiTransparentBackground {
+    background-color: rgba(255, 255, 224, 0.5);
   }

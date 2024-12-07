@@ -67,7 +67,7 @@ const Profile = () => {
 
   if (!user) {
     return (
-      <div className={styles.container}>
+      <div className={`${styles.container} ${styles.semiTransparentBox}`}>
         <h1 className={styles.welcome}>Welcome, Guest!</h1>
         <p className={styles.loginMessage}>Please log in under the Login tab!</p>
       </div>
