@@ -7,7 +7,7 @@
   font-family: 'Courier New', Courier, monospace;
   text-align: center;
   padding: 325px 0px 325px 0px;
-  background-image: url(/children.jpg);
+  background-image: url(../public/children.jpg);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: top-center;

@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
@@ -13,26 +14,55 @@ const multer = require('multer');
 
 const app = express();
 const port = process.env.PORT || 3000;
+const upload = multer({ dest: 'uploads/' });
 
-const CLIENT_ID = 'INSERT';
-const CLIENT_SECRET = 'INSERT';
-const client = new OAuth2Client(CLIENT_ID);
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
-// Middleware Setup
-app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001'],
-  credentials: true
-}));
+app.use(cors({ origin: ['http://localhost:3000', 'http://localhost:3001'], credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'your_session_secret',
+  secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: true
 }));
 app.use(passport.initialize());
 app.use(passport.session());
 
+passport.use(new GoogleStrategy({
+  clientID: CLIENT_ID,
+  clientSecret: CLIENT_SECRET,
+  callbackURL: 'http://localhost:3000/auth/google/callback'
+},
+async (accessToken, refreshToken, profile, done) => {
+  try {
+    let user = await User.findOne({ googleId: profile.id });
+    if (!user) {
+      user = new User({
+        googleId: profile.id,
+        name: profile.displayName,
+        email: profile.emails[0].value,
+        profilePhoto: profile.photos[0].value
+      });
+      await user.save();
+    }
+    return done(null, user);
+  } catch (err) {
+    return done(err, null);
+  }
+}));
+
+passport.serializeUser((user, done) => done(null, user.id));
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (err) {
+    done(err, null);
+  }
+});
 
 // Define the path to the uploads directory
 const uploadDir = path.join(__dirname, 'uploads');
@@ -54,8 +84,6 @@ const storage = multer.diskStorage({
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-const upload = multer({ storage: storage });
-
 // Authentication middleware
 const isAuthenticated = (req, res, next) => {
   if (req.isAuthenticated()) {
@@ -66,40 +94,6 @@ const isAuthenticated = (req, res, next) => {
 
 // Apply authentication middleware to all /api routes
 app.use('/api', isAuthenticated);
-
-// Google authentication strategy setup
-passport.use(new GoogleStrategy({
-  clientID: CLIENT_ID,
-  clientSecret: CLIENT_SECRET,
-  callbackURL: "INSERT",
-  scope: ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
-}, async (accessToken, refreshToken, profile, done) => {
-  try {
-    let user = await User.findOne({ googleId: profile.id });
-    if (!user) {
-      user = new User({
-        googleId: profile.id,
-        name: profile.displayName,
-        email: profile.emails[0].value,
-        profilePicture: profile.photos[0].value
-      });
-      await user.save();
-    }
-    return done(null, user);
-  } catch (error) {
-    return done(error, null);
-  }
-}));
-
-passport.serializeUser((user, done) => done(null, user.id));
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await User.findById(id);
-    done(null, user);
-  } catch (err) {
-    done(err, null);
-  }
-});
 
 async function verifyGoogleIdToken(idToken) {
   try {
@@ -116,20 +110,16 @@ async function verifyGoogleIdToken(idToken) {
 }
 
 // Mongoose connection setup
-const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/yourDatabaseName';
-mongoose.connect(mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => {
-  console.log('Connected to MongoDB');
-  app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    console.log('Connected to MongoDB');
+    app.listen(port, () => {
+      console.log(`Server running at http://localhost:${port}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Error connecting to MongoDB:', err.message);
   });
-})
-.catch((err) => {
-  console.error('Error connecting to MongoDB:', err.message);
-});
 
 // Routes
 // Google authentication routes
@@ -150,7 +140,7 @@ app.post('/api/auth/token', async (req, res) => {
     code,
     client_id: CLIENT_ID,
     client_secret: CLIENT_SECRET,
-    redirect_uri: 'INSERT',
+    redirect_uri: 'http://localhost:3000/auth/google/callback',
     grant_type: 'authorization_code'
   });
 
@@ -230,6 +220,30 @@ app.post('/api/people', upload.single('photo'), async (req, res) => {
   } catch (error) {
     console.error('Error creating person:', error);
     res.status(500).json({ message: 'Error creating person', error: error.message });
+  }
+});
+
+app.delete('/api/people/:personId/memories/:memoryId', async (req, res) => {
+  const { personId, memoryId } = req.params;
+
+  try {
+    const person = await Person.findOne({ _id: personId, user: req.user._id });
+    if (!person) {
+      return res.status(404).json({ message: 'Person not found' });
+    }
+
+    const memoryIndex = person.memories.findIndex(memory => memory._id.toString() === memoryId);
+    if (memoryIndex === -1) {
+      return res.status(404).json({ message: 'Memory not found' });
+    }
+
+    person.memories.splice(memoryIndex, 1);
+    await person.save();
+
+    res.status(200).json(person);
+  } catch (error) {
+    console.error('Error deleting memory:', error);
+    res.status(500).json({ message: 'Error deleting memory', error: error.message });
   }
 });
 
@@ -358,12 +372,14 @@ app.post('/api/people/:id/memories/:memoryId/comments', async (req, res) => {
   }
 });
 
-// Delete a memory
-app.delete('/api/people/:id/memories/:memoryId', async (req, res) => {
-  const { id, memoryId } = req.params;
+// Update a memory
+app.put('/api/people/:personId/memories/:memoryId', upload.single('photo'), async (req, res) => {
+  const { personId, memoryId } = req.params;
+  const { title, comment } = req.body;
+  const photo = req.file ? `http://localhost:3000/uploads/${req.file.filename}` : null;
 
   try {
-    const person = await Person.findOne({ _id: id, user: req.user._id });
+    const person = await Person.findOne({ _id: personId, user: req.user._id });
     if (!person) {
       return res.status(404).json({ message: 'Person not found' });
     }
@@ -373,13 +389,19 @@ app.delete('/api/people/:id/memories/:memoryId', async (req, res) => {
       return res.status(404).json({ message: 'Memory not found' });
     }
 
-    memory.remove();
+    memory.title = title;
+    memory.comment = comment;
+    if (photo) {
+      memory.photo = photo;
+    }
+
     await person.save();
     res.status(200).json(person);
   } catch (error) {
-    console.error('Error deleting memory:', error);
-    res.status(500).json({ message: 'Error deleting memory', error });
+    console.error('Error updating memory:', error);
+    res.status(500).json({ message: 'Error updating memory', error: error.message });
   }
 });
 
 module.exports = app;
+
