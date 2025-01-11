@@ -18,40 +18,11 @@ const Navbar = () => {
          {/* Website name/logo text */}
       <li className = {styles.logo}>
         <Link href="/">
-          Memory Mosaic
-<<<<<<< HEAD
-        </li>
-        <li>
-          <Link href="/" className={styles.item}>
-            Home
-          </Link>
-        </li>
-        <li>
-          <Link href="/login" className={styles.item}>
-            Login
-          </Link>
-        </li>
-        <li>
-          <Link href="/createUser" className={styles.item}>
-            Create User
-          </Link>
-        </li>
-        <li>
-          <Link href="/about" className={styles.item}>
-            About
-          </Link>
-        </li>
-        <li>
-          <Link href="/View-Person">View Person</Link>
-        </li>
-      </ul>
-    </nav>
-  );
-=======
-        </Link>
-      </li>
-    </ul>
-  </div>
+        Memory Mosaic
+      </Link>
+    </li>
+  </ul>
+</div>
 
 {/* Right side of the navbar */}
   <div className = {styles.navbarRight}>
@@ -98,7 +69,6 @@ const Navbar = () => {
 
 </nav>
 );
->>>>>>> 8063c3f81d0847d899437684cb7088f074b8986a
 };
 
 // Make the Navbar component available for use in other parts of the application
