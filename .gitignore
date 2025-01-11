@@ -131,3 +131,6 @@ dist
 .yarn/install-state.gz
 .pnp.*
 /BackEnd/node_modules
+
+# environment variables
+.env

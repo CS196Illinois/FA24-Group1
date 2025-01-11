@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
@@ -15,17 +16,53 @@ const app = express();
 const port = process.env.PORT || 3000;
 const upload = multer({ dest: 'uploads/' });
 
-const CLIENT_ID = 'INSERT';
-const CLIENT_SECRET = 'INSERT';
-const client = new OAuth2Client(CLIENT_ID);
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
-// Middleware Setup
 app.use(cors({ origin: ['http://localhost:3000', 'http://localhost:3001'], credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(session({ secret: process.env.SESSION_SECRET || 'your_session_secret', resave: false, saveUninitialized: false }));
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true
+}));
 app.use(passport.initialize());
 app.use(passport.session());
+
+passport.use(new GoogleStrategy({
+  clientID: CLIENT_ID,
+  clientSecret: CLIENT_SECRET,
+  callbackURL: 'http://localhost:3000/auth/google/callback'
+},
+async (accessToken, refreshToken, profile, done) => {
+  try {
+    let user = await User.findOne({ googleId: profile.id });
+    if (!user) {
+      user = new User({
+        googleId: profile.id,
+        name: profile.displayName,
+        email: profile.emails[0].value,
+        profilePhoto: profile.photos[0].value
+      });
+      await user.save();
+    }
+    return done(null, user);
+  } catch (err) {
+    return done(err, null);
+  }
+}));
+
+passport.serializeUser((user, done) => done(null, user.id));
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (err) {
+    done(err, null);
+  }
+});
 
 // Define the path to the uploads directory
 const uploadDir = path.join(__dirname, 'uploads');
@@ -58,41 +95,6 @@ const isAuthenticated = (req, res, next) => {
 // Apply authentication middleware to all /api routes
 app.use('/api', isAuthenticated);
 
-// Google authentication strategy setup
-passport.use(new GoogleStrategy({
-  clientID: CLIENT_ID,
-  clientSecret: CLIENT_SECRET,
-  callbackURL: "INSERT",
-  scope: ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
-}, async (accessToken, refreshToken, profile, done) => {
-  try {
-    let user = await User.findOne({ googleId: profile.id });
-    if (!user) {
-      user = new User({
-        googleId: profile.id,
-        name: profile.displayName,
-        email: profile.emails[0].value,
-        profilePicture: profile.photos[0].value
-      });
-      await user.save();
-    }
-    return done(null, user);
-  } catch (error) {
-    return done(error, null);
-  }
-}));
-
-passport.serializeUser((user, done) => done(null, user.id));
-
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await User.findById(id);
-    done(null, user);
-  } catch (err) {
-    done(err, null);
-  }
-});
-
 async function verifyGoogleIdToken(idToken) {
   try {
     const ticket = await client.verifyIdToken({
@@ -108,8 +110,7 @@ async function verifyGoogleIdToken(idToken) {
 }
 
 // Mongoose connection setup
-const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/yourDatabaseName';
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log('Connected to MongoDB');
     app.listen(port, () => {
