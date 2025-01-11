@@ -4,6 +4,10 @@
         "source": "/(.*)",
         "destination": "/"
       }
-    ]
+    ],
+        "framework": "nextjs",
+        "buildCommand": "cd Project/frontend && next build",
+        "outputDirectory": "Project/frontend/.next"
+      
   }
   
